@@ -75,7 +75,7 @@ class TestKeplerSTM(unittest.TestCase):
         Test method: initialize all possible constructors and sanity check generated objects
         """
 
-        test_str = 'keplertools.KeplerSTM_C.CyKeplerSTM'
+        test_str = 'keplertools.CyKeplerSTM'
 
         ps = keplerSTM.planSys(np.random.randn(6),np.random.rand(1))
         print("havec=%s"%ps.havec)
