@@ -78,7 +78,7 @@ class TestKeplerSTM(unittest.TestCase):
         test_str = 'keplertools.KeplerSTM_C.CyKeplerSTM'
 
         ps = keplerSTM.planSys(np.random.randn(6),np.random.rand(1))
-        print("havec=%s"%havec)
+        print("havec=%s"%ps.havec)
         if test_str in sys.modules:
             self.assertTrue(ps.havec)
         else:
