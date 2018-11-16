@@ -2,7 +2,7 @@ r"""Kepler State Propagation unit tests
 
 based on tests by Michael Turmon, JPL, Apr. 2016
 """
-
+from __future__ import print_function
 import unittest
 from keplertools import keplerSTM
 import numpy as np
@@ -78,6 +78,7 @@ class TestKeplerSTM(unittest.TestCase):
         test_str = 'keplertools.KeplerSTM_C.CyKeplerSTM'
 
         ps = keplerSTM.planSys(np.random.randn(6),np.random.rand(1))
+        print("havec=%s"%havec)
         if test_str in sys.modules:
             self.assertTrue(ps.havec)
         else:
