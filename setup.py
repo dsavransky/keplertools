@@ -1,5 +1,7 @@
 import setuptools
 import numpy
+from __future__ import print_function
+
 
 try:
     from Cython.Build import cythonize
@@ -8,6 +10,7 @@ except ImportError:
 else:
     use_cython = True
 
+print("use_cython=%s"%use_cython)
 
 ext = '.pyx' if use_cython else '.c'
 extensions = [setuptools.Extension("keplertools.CyKeplerSTM", \
