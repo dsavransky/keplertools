@@ -1,0 +1,5 @@
+[run]
+source = keplerstm
+omit =
+  keplertools/KeplerSTM_C/CyKeplerSTM_setup.py
+
