@@ -4,17 +4,21 @@
 {
     "distutils": {
         "depends": [
+            "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/numpy/core/include/numpy/arrayobject.h", 
+            "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/numpy/core/include/numpy/ufuncobject.h", 
             "keplertools/KeplerSTM_C/KeplerSTM_C.h"
         ], 
         "include_dirs": [
-            "keplertools/KeplerSTM_C"
+            "keplertools/KeplerSTM_C", 
+            "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/numpy/core/include"
         ], 
-        "name": "keplertools.KeplerSTM_C", 
+        "name": "keplertools.CyKeplerSTM", 
         "sources": [
-            "keplertools/KeplerSTM_C/CyKeplerSTM.pyx"
+            "keplertools/KeplerSTM_C/CyKeplerSTM.pyx", 
+            "keplertools/KeplerSTM_C/KeplerSTM_C.c"
         ]
     }, 
-    "module_name": "keplertools.KeplerSTM_C"
+    "module_name": "keplertools.CyKeplerSTM"
 }
 END: Cython Metadata */
 
@@ -577,8 +581,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__keplertools__KeplerSTM_C
-#define __PYX_HAVE_API__keplertools__KeplerSTM_C
+#define __PYX_HAVE__keplertools__CyKeplerSTM
+#define __PYX_HAVE_API__keplertools__CyKeplerSTM
 /* Early includes */
 #include <string.h>
 #include <stdio.h>
@@ -1047,7 +1051,7 @@ typedef npy_longdouble __pyx_t_5numpy_longdouble_t;
  * 
  * cdef extern from "KeplerSTM_C.h":
  */
-typedef __pyx_t_5numpy_double_t __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t;
+typedef __pyx_t_5numpy_double_t __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t;
 /* Declarations.proto */
 #if CYTHON_CCOMPLEX
   #ifdef __cplusplus
@@ -1613,13 +1617,13 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 
 /* Module declarations from 'cython' */
 
-/* Module declarations from 'keplertools.KeplerSTM_C' */
-static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t = { "DTYPE_t", NULL, sizeof(__pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "keplertools.KeplerSTM_C"
-extern int __pyx_module_is_main_keplertools__KeplerSTM_C;
-int __pyx_module_is_main_keplertools__KeplerSTM_C = 0;
+/* Module declarations from 'keplertools.CyKeplerSTM' */
+static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t = { "DTYPE_t", NULL, sizeof(__pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t), { 0 }, 0, 'R', 0, 0 };
+#define __Pyx_MODULE_NAME "keplertools.CyKeplerSTM"
+extern int __pyx_module_is_main_keplertools__CyKeplerSTM;
+int __pyx_module_is_main_keplertools__CyKeplerSTM = 0;
 
-/* Implementation of 'keplertools.KeplerSTM_C' */
+/* Implementation of 'keplertools.CyKeplerSTM' */
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
@@ -1653,7 +1657,7 @@ static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_Integration_failed[] = "Integration failed.";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_Incompatible_inputs[] = "Incompatible inputs.";
-static const char __pyx_k_keplertools_KeplerSTM_C[] = "keplertools.KeplerSTM_C";
+static const char __pyx_k_keplertools_CyKeplerSTM[] = "keplertools.CyKeplerSTM";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
@@ -1681,7 +1685,7 @@ static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_epsmult;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_j;
-static PyObject *__pyx_n_s_keplertools_KeplerSTM_C;
+static PyObject *__pyx_n_s_keplertools_CyKeplerSTM;
 static PyObject *__pyx_kp_s_keplertools_KeplerSTM_C_CyKepler;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_mucounter;
@@ -1702,7 +1706,7 @@ static PyObject *__pyx_n_s_x1;
 static PyObject *__pyx_n_s_xin;
 static PyObject *__pyx_n_s_xout;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_x0, __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t __pyx_v_dt, PyArrayObject *__pyx_v_mus, __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t __pyx_v_epsmult); /* proto */
+static PyObject *__pyx_pf_11keplertools_11CyKeplerSTM_CyKeplerSTM(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_x0, __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t __pyx_v_dt, PyArrayObject *__pyx_v_mus, __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t __pyx_v_epsmult); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_int_6;
@@ -1731,14 +1735,14 @@ static PyObject *__pyx_codeobj__14;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11keplertools_11KeplerSTM_C_1CyKeplerSTM(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11keplertools_11KeplerSTM_C_CyKeplerSTM[] = "\n    Kepler State Transition Matrix\n\n    Cythonized version of the Kepler State Transition Matrix Calculations.\n    This provides a single method to iteratively call the backend KeplerSTM_C function\n    on inputs.  \n\n    Args:\n        x0 (ndarray):\n            6n x 1 vector of stacked positions and velocities for n planets\n        dt (float):\n            Time step\n        mus (ndarray):\n            n x 1 vector of standard gravitational parameters mu = G(m+m_s) where m is \n            the planet mass, m_s is the star mass and G is the gravitational \n            constant\n        epsmult (float):\n            default multiplier on floating point precision, used as convergence \n            metric.  Higher values mean faster convergence, but sacrifice precision.\n            \n    Return:\n        x1 (ndarray):\n            Propagated orbital values (equivalent dimension to x0)\n    \n    Notes:\n        All units must be complementary (i.e., if position is AU and velocity\n        is AU/day, mu must be in AU^3/day^2).\n\n    ";
-static PyMethodDef __pyx_mdef_11keplertools_11KeplerSTM_C_1CyKeplerSTM = {"CyKeplerSTM", (PyCFunction)__pyx_pw_11keplertools_11KeplerSTM_C_1CyKeplerSTM, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11keplertools_11KeplerSTM_C_CyKeplerSTM};
-static PyObject *__pyx_pw_11keplertools_11KeplerSTM_C_1CyKeplerSTM(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11keplertools_11CyKeplerSTM_1CyKeplerSTM(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11keplertools_11CyKeplerSTM_CyKeplerSTM[] = "\n    Kepler State Transition Matrix\n\n    Cythonized version of the Kepler State Transition Matrix Calculations.\n    This provides a single method to iteratively call the backend KeplerSTM_C function\n    on inputs.  \n\n    Args:\n        x0 (ndarray):\n            6n x 1 vector of stacked positions and velocities for n planets\n        dt (float):\n            Time step\n        mus (ndarray):\n            n x 1 vector of standard gravitational parameters mu = G(m+m_s) where m is \n            the planet mass, m_s is the star mass and G is the gravitational \n            constant\n        epsmult (float):\n            default multiplier on floating point precision, used as convergence \n            metric.  Higher values mean faster convergence, but sacrifice precision.\n            \n    Return:\n        x1 (ndarray):\n            Propagated orbital values (equivalent dimension to x0)\n    \n    Notes:\n        All units must be complementary (i.e., if position is AU and velocity\n        is AU/day, mu must be in AU^3/day^2).\n\n    ";
+static PyMethodDef __pyx_mdef_11keplertools_11CyKeplerSTM_1CyKeplerSTM = {"CyKeplerSTM", (PyCFunction)__pyx_pw_11keplertools_11CyKeplerSTM_1CyKeplerSTM, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11keplertools_11CyKeplerSTM_CyKeplerSTM};
+static PyObject *__pyx_pw_11keplertools_11CyKeplerSTM_1CyKeplerSTM(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyArrayObject *__pyx_v_x0 = 0;
-  __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t __pyx_v_dt;
+  __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t __pyx_v_dt;
   PyArrayObject *__pyx_v_mus = 0;
-  __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t __pyx_v_epsmult;
+  __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t __pyx_v_epsmult;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("CyKeplerSTM (wrapper)", 0);
@@ -1804,13 +1808,13 @@ static PyObject *__pyx_pw_11keplertools_11KeplerSTM_C_1CyKeplerSTM(PyObject *__p
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("CyKeplerSTM", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 13, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("keplertools.KeplerSTM_C.CyKeplerSTM", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("keplertools.CyKeplerSTM.CyKeplerSTM", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_x0), __pyx_ptype_5numpy_ndarray, 1, "x0", 0))) __PYX_ERR(0, 13, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_mus), __pyx_ptype_5numpy_ndarray, 1, "mus", 0))) __PYX_ERR(0, 13, __pyx_L1_error)
-  __pyx_r = __pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(__pyx_self, __pyx_v_x0, __pyx_v_dt, __pyx_v_mus, __pyx_v_epsmult);
+  __pyx_r = __pyx_pf_11keplertools_11CyKeplerSTM_CyKeplerSTM(__pyx_self, __pyx_v_x0, __pyx_v_dt, __pyx_v_mus, __pyx_v_epsmult);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1821,7 +1825,7 @@ static PyObject *__pyx_pw_11keplertools_11KeplerSTM_C_1CyKeplerSTM(PyObject *__p
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_x0, __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t __pyx_v_dt, PyArrayObject *__pyx_v_mus, __pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t __pyx_v_epsmult) {
+static PyObject *__pyx_pf_11keplertools_11CyKeplerSTM_CyKeplerSTM(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_x0, __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t __pyx_v_dt, PyArrayObject *__pyx_v_mus, __pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t __pyx_v_epsmult) {
   int __pyx_v_N;
   PyArrayObject *__pyx_v_x1 = 0;
   PyArrayObject *__pyx_v_xin = 0;
@@ -1880,12 +1884,12 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
   __pyx_pybuffernd_mus.rcbuffer = &__pyx_pybuffer_mus;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x0.rcbuffer->pybuffer, (PyObject*)__pyx_v_x0, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 13, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x0.rcbuffer->pybuffer, (PyObject*)__pyx_v_x0, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 13, __pyx_L1_error)
   }
   __pyx_pybuffernd_x0.diminfo[0].strides = __pyx_pybuffernd_x0.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x0.diminfo[0].shape = __pyx_pybuffernd_x0.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_mus.rcbuffer->pybuffer, (PyObject*)__pyx_v_mus, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 13, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_mus.rcbuffer->pybuffer, (PyObject*)__pyx_v_mus, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 13, __pyx_L1_error)
   }
   __pyx_pybuffernd_mus.diminfo[0].strides = __pyx_pybuffernd_mus.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_mus.diminfo[0].shape = __pyx_pybuffernd_mus.rcbuffer->pybuffer.shape[0];
 
@@ -1977,7 +1981,7 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
   __pyx_t_8 = ((PyArrayObject *)__pyx_t_7);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x1.rcbuffer->pybuffer, (PyObject*)__pyx_t_8, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_x1.rcbuffer->pybuffer, (PyObject*)__pyx_t_8, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_x1 = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_x1.rcbuffer->pybuffer.buf = NULL;
       __PYX_ERR(0, 49, __pyx_L1_error)
     } else {__pyx_pybuffernd_x1.diminfo[0].strides = __pyx_pybuffernd_x1.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_x1.diminfo[0].shape = __pyx_pybuffernd_x1.rcbuffer->pybuffer.shape[0];
@@ -2013,7 +2017,7 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
   __pyx_t_9 = ((PyArrayObject *)__pyx_t_5);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xin.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xin.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_xin = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_xin.rcbuffer->pybuffer.buf = NULL;
       __PYX_ERR(0, 50, __pyx_L1_error)
     } else {__pyx_pybuffernd_xin.diminfo[0].strides = __pyx_pybuffernd_xin.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_xin.diminfo[0].shape = __pyx_pybuffernd_xin.rcbuffer->pybuffer.shape[0];
@@ -2049,7 +2053,7 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
   __pyx_t_10 = ((PyArrayObject *)__pyx_t_1);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xout.rcbuffer->pybuffer, (PyObject*)__pyx_t_10, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xout.rcbuffer->pybuffer, (PyObject*)__pyx_t_10, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_xout = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_xout.rcbuffer->pybuffer.buf = NULL;
       __PYX_ERR(0, 51, __pyx_L1_error)
     } else {__pyx_pybuffernd_xout.diminfo[0].strides = __pyx_pybuffernd_xout.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_xout.diminfo[0].shape = __pyx_pybuffernd_xout.rcbuffer->pybuffer.shape[0];
@@ -2104,10 +2108,10 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
       __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_xin.rcbuffer->pybuffer);
-      __pyx_t_11 = __Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xin.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack);
+      __pyx_t_11 = __Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xin.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack);
       if (unlikely(__pyx_t_11 < 0)) {
         PyErr_Fetch(&__pyx_t_12, &__pyx_t_13, &__pyx_t_14);
-        if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xin.rcbuffer->pybuffer, (PyObject*)__pyx_v_xin, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
+        if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_xin.rcbuffer->pybuffer, (PyObject*)__pyx_v_xin, &__Pyx_TypeInfo_nn___pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
           Py_XDECREF(__pyx_t_12); Py_XDECREF(__pyx_t_13); Py_XDECREF(__pyx_t_14);
           __Pyx_RaiseBufferFallbackError();
         } else {
@@ -2130,7 +2134,7 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
  *             res = KeplerSTM_C_vallado(<double*> xin.data, dt, mus[mucounter], <double*> xout.data, epsmult)
  */
     __pyx_t_15 = __pyx_v_mucounter;
-    __pyx_v_res = KeplerSTM_C(((double *)__pyx_v_xin->data), __pyx_v_dt, (*__Pyx_BufPtrStrided1d(__pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t *, __pyx_pybuffernd_mus.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_mus.diminfo[0].strides)), ((double *)__pyx_v_xout->data), __pyx_v_epsmult);
+    __pyx_v_res = KeplerSTM_C(((double *)__pyx_v_xin->data), __pyx_v_dt, (*__Pyx_BufPtrStrided1d(__pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t *, __pyx_pybuffernd_mus.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_mus.diminfo[0].strides)), ((double *)__pyx_v_xout->data), __pyx_v_epsmult);
 
     /* "keplertools/KeplerSTM_C/CyKeplerSTM.pyx":58
  *         xin = x0[j:j+6]
@@ -2150,7 +2154,7 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
  *                 raise Exception("Integration failed.")
  */
       __pyx_t_16 = __pyx_v_mucounter;
-      __pyx_v_res = KeplerSTM_C_vallado(((double *)__pyx_v_xin->data), __pyx_v_dt, (*__Pyx_BufPtrStrided1d(__pyx_t_11keplertools_11KeplerSTM_C_DTYPE_t *, __pyx_pybuffernd_mus.rcbuffer->pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_mus.diminfo[0].strides)), ((double *)__pyx_v_xout->data), __pyx_v_epsmult);
+      __pyx_v_res = KeplerSTM_C_vallado(((double *)__pyx_v_xin->data), __pyx_v_dt, (*__Pyx_BufPtrStrided1d(__pyx_t_11keplertools_11CyKeplerSTM_DTYPE_t *, __pyx_pybuffernd_mus.rcbuffer->pybuffer.buf, __pyx_t_16, __pyx_pybuffernd_mus.diminfo[0].strides)), ((double *)__pyx_v_xout->data), __pyx_v_epsmult);
 
       /* "keplertools/KeplerSTM_C/CyKeplerSTM.pyx":60
  *         if (res != 0):
@@ -2256,7 +2260,7 @@ static PyObject *__pyx_pf_11keplertools_11KeplerSTM_C_CyKeplerSTM(CYTHON_UNUSED 
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_xin.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_xout.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("keplertools.KeplerSTM_C.CyKeplerSTM", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("keplertools.CyKeplerSTM.CyKeplerSTM", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -4743,17 +4747,17 @@ static PyMethodDef __pyx_methods[] = {
 #if PY_MAJOR_VERSION >= 3
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 static PyObject* __pyx_pymod_create(PyObject *spec, PyModuleDef *def); /*proto*/
-static int __pyx_pymod_exec_KeplerSTM_C(PyObject* module); /*proto*/
+static int __pyx_pymod_exec_CyKeplerSTM(PyObject* module); /*proto*/
 static PyModuleDef_Slot __pyx_moduledef_slots[] = {
   {Py_mod_create, (void*)__pyx_pymod_create},
-  {Py_mod_exec, (void*)__pyx_pymod_exec_KeplerSTM_C},
+  {Py_mod_exec, (void*)__pyx_pymod_exec_CyKeplerSTM},
   {0, NULL}
 };
 #endif
 
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
-    "KeplerSTM_C",
+    "CyKeplerSTM",
     0, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
@@ -4791,7 +4795,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_epsmult, __pyx_k_epsmult, sizeof(__pyx_k_epsmult), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_j, __pyx_k_j, sizeof(__pyx_k_j), 0, 0, 1, 1},
-  {&__pyx_n_s_keplertools_KeplerSTM_C, __pyx_k_keplertools_KeplerSTM_C, sizeof(__pyx_k_keplertools_KeplerSTM_C), 0, 0, 1, 1},
+  {&__pyx_n_s_keplertools_CyKeplerSTM, __pyx_k_keplertools_CyKeplerSTM, sizeof(__pyx_k_keplertools_CyKeplerSTM), 0, 0, 1, 1},
   {&__pyx_kp_s_keplertools_KeplerSTM_C_CyKepler, __pyx_k_keplertools_KeplerSTM_C_CyKepler, sizeof(__pyx_k_keplertools_KeplerSTM_C_CyKepler), 0, 0, 1, 0},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_mucounter, __pyx_k_mucounter, sizeof(__pyx_k_mucounter), 0, 0, 1, 1},
@@ -5089,11 +5093,11 @@ static int __Pyx_modinit_function_import_code(void) {
 
 
 #if PY_MAJOR_VERSION < 3
-__Pyx_PyMODINIT_FUNC initKeplerSTM_C(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC initKeplerSTM_C(void)
+__Pyx_PyMODINIT_FUNC initCyKeplerSTM(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC initCyKeplerSTM(void)
 #else
-__Pyx_PyMODINIT_FUNC PyInit_KeplerSTM_C(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC PyInit_KeplerSTM_C(void)
+__Pyx_PyMODINIT_FUNC PyInit_CyKeplerSTM(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC PyInit_CyKeplerSTM(void)
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 {
   return PyModuleDef_Init(&__pyx_moduledef);
@@ -5133,7 +5137,7 @@ bad:
 }
 
 
-static int __pyx_pymod_exec_KeplerSTM_C(PyObject *__pyx_pyinit_module)
+static int __pyx_pymod_exec_CyKeplerSTM(PyObject *__pyx_pyinit_module)
 #endif
 #endif
 {
@@ -5154,7 +5158,7 @@ if (!__Pyx_RefNanny) {
       Py_FatalError("failed to import 'refnanny' module");
 }
 #endif
-  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_KeplerSTM_C(void)", 0);
+  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_CyKeplerSTM(void)", 0);
   if (__Pyx_check_binary_version() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_empty_tuple = PyTuple_New(0); if (unlikely(!__pyx_empty_tuple)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_empty_bytes = PyBytes_FromStringAndSize("", 0); if (unlikely(!__pyx_empty_bytes)) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -5190,7 +5194,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("KeplerSTM_C", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("CyKeplerSTM", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -5209,14 +5213,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_keplertools__KeplerSTM_C) {
+  if (__pyx_module_is_main_keplertools__CyKeplerSTM) {
     if (PyObject_SetAttrString(__pyx_m, "__name__", __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "keplertools.KeplerSTM_C")) {
-      if (unlikely(PyDict_SetItemString(modules, "keplertools.KeplerSTM_C", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "keplertools.CyKeplerSTM")) {
+      if (unlikely(PyDict_SetItemString(modules, "keplertools.CyKeplerSTM", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -5269,7 +5273,7 @@ if (!__Pyx_RefNanny) {
  *     '''
  *     Kepler State Transition Matrix
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_11keplertools_11KeplerSTM_C_1CyKeplerSTM, NULL, __pyx_n_s_keplertools_KeplerSTM_C); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_11keplertools_11CyKeplerSTM_1CyKeplerSTM, NULL, __pyx_n_s_keplertools_CyKeplerSTM); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_CyKeplerSTM, __pyx_t_2) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5300,11 +5304,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init keplertools.KeplerSTM_C", 0, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init keplertools.CyKeplerSTM", 0, __pyx_lineno, __pyx_filename);
     }
     Py_DECREF(__pyx_m); __pyx_m = 0;
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init keplertools.KeplerSTM_C");
+    PyErr_SetString(PyExc_ImportError, "init keplertools.CyKeplerSTM");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
