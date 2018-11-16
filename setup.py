@@ -1,6 +1,6 @@
+from __future__ import print_function
 import setuptools
 import numpy
-from __future__ import print_function
 
 
 try:
