@@ -17,7 +17,6 @@
 
 int eccanom_C(double E[], double M[], double e[], double epsmult, int maxIter, int n){
 
-    int arrSize = n * sizeof (double);
     int j;
     double tmp;
 
