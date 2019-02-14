@@ -11,8 +11,11 @@ else:
 
 ext = '.pyx' if use_cython else '.c'
 extensions = [setuptools.Extension("keplertools.CyKeplerSTM", \
-        ["keplertools/KeplerSTM_C/CyKeplerSTM"+ext, "keplertools/KeplerSTM_C/KeplerSTM_C.c"],\
-        include_dirs = [numpy.get_include()])]
+             ["keplertools/KeplerSTM_C/CyKeplerSTM"+ext, "keplertools/KeplerSTM_C/KeplerSTM_C.c"],\
+              include_dirs = [numpy.get_include()]),
+              setuptools.Extension("keplertools.Cyeccanom", \
+             ["keplertools/eccanom_C/Cyeccanom"+ext, "keplertools/eccanom_C/eccanom_C.c"],\
+              include_dirs = [numpy.get_include()]) ]
 
 if use_cython:
     extensions = cythonize(extensions)
