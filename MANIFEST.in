@@ -1,3 +1,7 @@
 include LICENSE README.md
+include keplertools/KeplerSTM_C/CyKeplerSTM.pyx keplertools/KeplerSTM_C/KeplerSTM_C.*
+exclude keplertools/KeplerSTM_C/CyKeplerSTM.c
+include keplertools/eccanom_C/Cyeccanom.pyx keplertools/eccanom_C/eccanom_C.*
+exclude keplertools/eccanom_C/Cyeccanom.c
 recursive-exclude tests *
 exclude requirements.txt .gitignore .travis.yml .coveragerc

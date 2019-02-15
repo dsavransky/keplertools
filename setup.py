@@ -26,7 +26,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="keplertools",
-    version="0.0.1",
+    version="0.1.0",
     author="Dmitry Savransky",
     author_email="ds264@cornell.edu",
     description="Two-body orbital propagation tools",
@@ -34,7 +34,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/dsavransky/keplertools",
     packages=setuptools.find_packages(exclude=['tests*']),
-    install_requires=['numpy'],
+    install_requires=['numpy','cython'],
     classifiers=[
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.5",
