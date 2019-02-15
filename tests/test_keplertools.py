@@ -1,9 +1,9 @@
 from __future__ import print_function
 import unittest
-from keplertools import keplertools
+from keplertools.fun import *
 import numpy as np
 
-class TestKeplerSTM(unittest.TestCase):
+class TestKeplerTools(unittest.TestCase):
     """
     Test method: verify invertibility of all transformations using random inputs
     """
@@ -21,7 +21,7 @@ class TestKeplerSTM(unittest.TestCase):
         M = np.random.randn(int(1e6))*2*np.pi
         e = np.random.rand(1)[0]
 
-        E = keplertools.eccanom(M,e)   
+        E = eccanom(M,e)   
         calcM = E - e*np.sin(E)
         self.assertTrue(np.max(np.abs(calcM - np.mod(M, 2*np.pi))) < np.finfo(float).eps*10.)
     
@@ -31,7 +31,7 @@ class TestKeplerSTM(unittest.TestCase):
         M = np.random.randn(int(1e6))*2*np.pi
         e = np.random.rand(1)[0]
 
-        E = keplertools.eccanom(M,e,noc=True)   
+        E = eccanom(M,e,noc=True)   
         calcM = E - e*np.sin(E)
         self.assertTrue(np.max(np.abs(calcM - np.mod(M, 2*np.pi))) < np.finfo(float).eps*10.)
 
@@ -41,7 +41,7 @@ class TestKeplerSTM(unittest.TestCase):
         M = np.random.randn(int(1e6))*2*np.pi
         e = np.random.rand(int(1e6))
 
-        E = keplertools.eccanom(M,e)   
+        E = eccanom(M,e)   
         calcM = E - e*np.sin(E)
         self.assertTrue(np.max(np.abs(calcM - np.mod(M, 2*np.pi))) < np.finfo(float).eps*10.)
 
@@ -51,7 +51,7 @@ class TestKeplerSTM(unittest.TestCase):
         M = np.random.randn(int(1e6))*2*np.pi
         e = np.random.rand(int(1e6))
 
-        E = keplertools.eccanom(M,e,noc=True)   
+        E = eccanom(M,e,noc=True)   
         calcM = E - e*np.sin(E)
         self.assertTrue(np.max(np.abs(calcM - np.mod(M, 2*np.pi))) < np.finfo(float).eps*10.)
 
@@ -59,7 +59,7 @@ class TestKeplerSTM(unittest.TestCase):
         M = np.random.rand(1)[0]*2*np.pi
         e = np.random.rand(1)[0]
 
-        E = keplertools.eccanom(M,e)   
+        E = eccanom(M,e)   
         calcM = E - e*np.sin(E)
         self.assertTrue(np.max(np.abs(calcM - np.mod(M, 2*np.pi))) < np.finfo(float).eps*10.)
 
@@ -67,7 +67,7 @@ class TestKeplerSTM(unittest.TestCase):
         M = np.random.rand(1)[0]*2*np.pi
         e = np.random.rand(1)[0]
 
-        E = keplertools.eccanom(M,e,noc=True)   
+        E = eccanom(M,e,noc=True)   
         calcM = E - e*np.sin(E)
         self.assertTrue(np.max(np.abs(calcM - np.mod(M, 2*np.pi))) < np.finfo(float).eps*10.)
 
@@ -76,7 +76,7 @@ class TestKeplerSTM(unittest.TestCase):
          e = np.random.rand(30)
 
          with self.assertRaises(AssertionError):
-            E = keplertools.eccanom(M,e,noc=True) 
+            E = eccanom(M,e,noc=True) 
 
     def test_orbElem2vec_1body(self):
         #generate one body full orbit
@@ -88,8 +88,8 @@ class TestKeplerSTM(unittest.TestCase):
         E = np.linspace(0.01,2*np.pi-0.01,100) #bad stuff happens in mod right at boundaries so clip E
 
         #convert back and forth to vectors
-        rs,vs,ABs = keplertools.orbElem2vec(E,1.0,orbElem=(a,e,O,I,w),returnAB=True)
-        a1,e1,E1,O1,I1,w1,P1,tau1 = keplertools.vec2orbElem(rs,vs,1.0)
+        rs,vs,ABs = orbElem2vec(E,1.0,orbElem=(a,e,O,I,w),returnAB=True)
+        a1,e1,E1,O1,I1,w1,P1,tau1 = vec2orbElem(rs,vs,1.0)
 
         tol = np.spacing(np.max(np.abs(np.linalg.norm(rs,axis=0))))*10000
 
@@ -102,8 +102,8 @@ class TestKeplerSTM(unittest.TestCase):
         self.assertTrue(np.max(np.abs(E - E1))<tol)
 
         #convert back and forth again using A,B
-        rs,vs = keplertools.orbElem2vec(E,1.0,AB=ABs)
-        a1,e1,E1,O1,I1,w1,P1,tau1 = keplertools.vec2orbElem(rs,vs,1.0)
+        rs,vs = orbElem2vec(E,1.0,AB=ABs)
+        a1,e1,E1,O1,I1,w1,P1,tau1 = vec2orbElem(rs,vs,1.0)
 
         self.assertTrue(np.max(np.abs(a - a1))<tol)
         self.assertTrue(np.max(np.abs(e - e1))<tol)
@@ -125,8 +125,8 @@ class TestKeplerSTM(unittest.TestCase):
         mus = np.random.rand(n)
 
         #convert back and forth to vectors
-        rs,vs,ABs = keplertools.orbElem2vec(E,mus,orbElem=(a,e,O,I,w),returnAB=True)
-        a1,e1,E1,O1,I1,w1,P1,tau1 = keplertools.vec2orbElem(rs,vs,mus)
+        rs,vs,ABs = orbElem2vec(E,mus,orbElem=(a,e,O,I,w),returnAB=True)
+        a1,e1,E1,O1,I1,w1,P1,tau1 = vec2orbElem(rs,vs,mus)
 
         tol = np.spacing(np.max(np.abs(np.linalg.norm(rs,axis=0))))*100000
 
@@ -139,8 +139,8 @@ class TestKeplerSTM(unittest.TestCase):
         self.assertTrue(np.max(np.abs(E - E1))<tol)
 
         #convert back and forth again using A,B
-        rs,vs = keplertools.orbElem2vec(E,mus,AB=ABs)
-        a1,e1,E1,O1,I1,w1,P1,tau1 = keplertools.vec2orbElem(rs,vs,mus)
+        rs,vs = orbElem2vec(E,mus,AB=ABs)
+        a1,e1,E1,O1,I1,w1,P1,tau1 = vec2orbElem(rs,vs,mus)
 
         self.assertTrue(np.max(np.abs(a - a1))<tol)
         self.assertTrue(np.max(np.abs(e - e1))<tol)
@@ -153,7 +153,7 @@ class TestKeplerSTM(unittest.TestCase):
         n = int(1e6)
         E = np.random.rand(n)*2*np.pi
         e = np.random.rand(n)
-        nu = keplertools.trueanom(E,e)
+        nu = trueanom(E,e)
 
         self.assertTrue(np.max(np.abs(e + (1-e**2)/(1+e*np.cos(nu))*np.cos(nu) - np.cos(E))) < 1e-9)
 
