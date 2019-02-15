@@ -133,6 +133,107 @@ def trueanom(E, e):
 
     return nu
 
+def vec2orbElem2(rs,vs,mus):
+    """ Convert position and velocity vectors to Keplerian orbital elements
+
+    Implements the algorithm from Vallado
+    
+    Args:
+        rs (ndarray):
+            3n x 1 stacked initial position vectors:
+              [r1(1);r1(2);r1(3);r2(1);r2(2)r2(3);...;rn(1);rn(2);rn(3)]
+            or 3 x n or n x 3 matrix of position vecotrs.
+        vs (ndarray):
+            3n x 1 stacked initial velocity vectors or 3 x n or n x3 matrix
+        mus (ndarray or float)
+            nx1 array of gravitational parameters (G*m_i) where G is the
+            gravitational constant and m_i is the mass of the ith body.
+            if all vectors represent the same body, mus may be a scalar.
+
+    Returns:
+        a (ndarray):
+            Semi-major axes
+        e (ndarray):
+            eccentricities
+        E (ndarray):
+            eccentric anomalies
+        O (ndarray):
+            longitudes of ascending nodes (rad)
+        I (ndarray):
+            inclinations (rad)
+        w (ndarray):
+            arguments of pericenter (rad)
+        P (ndarray):
+            orbital periods
+        tau (ndarray):
+            time of periapsis crossing
+    
+
+    Notes:
+        All units must be complementary, i.e., if positions are in AU, and time is in
+        days, vs must be in AU/day, mus must be in AU^3/day^2
+
+
+    """
+    assert (np.mod(rs.size,3) == 0) and (vs.size == rs.size),\
+            "rs and vs must be of the same size and contain 3n elements."
+    
+    nplanets = rs.size/3.
+    assert np.isscalar(mus) or mus.size == nplanets, "mus must be scalar or of size n"
+
+    assert rs.ndim < 3, "rs cannot have more than two dimensions"
+    if rs.ndim == 1:
+        rs = np.reshape(rs,(nplanets,3)).T
+    else:
+        assert 3 in rs.shape, "rs must be 3xn or nx3"
+        if rs.shape[0] != 3:
+            rs = rs.T
+
+    assert vs.ndim < 3, "vs cannot have more than two dimensions"
+    if vs.ndim == 1:
+        vs = np.reshape(vs,(nplanets,3)).T
+    else:
+        assert 3 in vs.shape, "vs must be 3xn or nx3"
+        if vs.shape[0] != 3:
+            vs = vs.T
+    
+    v2s = np.sum(vs**2.,axis=0)                 #orbital velocity squared
+    rmag = np.sqrt(np.sum(rs**2.,axis=0))       #orbital radius
+
+    hvec = np.vstack((rs[1]*vs[2] - rs[2]*vs[1],\
+                rs[2]*vs[0] - rs[0]*vs[2],\
+                rs[0]*vs[1] - rs[1]*vs[0]))     #angular momentum vector
+    nvec = np.vstack((-hvec[1],hvec[0],np.zeros(len(hvec[2])))) #node-pointing vector
+    evec = np.tile((v2s - mus/rmag)/mus,(3,1))*rs  - np.tile(np.sum(rs*vs,axis=0)/mus,(3,1))*vs #eccentricity vector
+    nmag = np.sqrt(np.sum(nvec**2.,axis=0))  
+    e = np.sqrt(np.sum(evec**2.,axis=0))  
+
+    En = v2s/2 - mus/rmag
+    a = -mus/2/En
+    ell = a*(1 - e**2)
+    if np.any(e == 1):
+        tmp = np.sum(hvec**2.,axis=0)/mus
+        ell[e == 1] = tmp[e == 1]
+
+    #angles
+    I = np.arccos(hvec[2]/np.sqrt(np.sum(hvec**2.,axis=0)))
+    O = np.arccos(nvec[0]/nmag)
+    O[nvec[2] < 0] = 2*np.pi - O[nvec[2] < 0]
+    w = np.arccos(np.sum(nvec*evec,axis=0)/e/nmag)
+    w[evec[2] < 0] = 2*np.pi - w[evec[2] < 0]
+
+    #ecentric anomaly
+    cosE = (1.0 - rmag/a)/e
+    sinE = np.sum(rs*vs,axis=0)/(e*np.sqrt(mus*a))
+    E = np.mod(np.arctan2(sinE,cosE),2*np.pi)
+
+    #orbital periods
+    P = 2*np.pi*np.sqrt(a**3./mus)
+
+    #time of periapsis crossing
+    tau = -(E - e*np.sin(E))/np.sqrt(mus*a**-3.)
+
+    return a,e,E,O,I,w,P,tau
 
 def vec2orbElem(rs,vs,mus):
     """ Convert position and velocity vectors to Keplerian orbital elements
@@ -214,22 +315,21 @@ def vec2orbElem(rs,vs,mus):
     #ecentric anomaly
     cosE = (1.0 - r/a)/e
     sinE = np.sum(rs*vs,axis=0)/(e*np.sqrt(mus*a))
-    E = np.arctan2(sinE,cosE)
+    E = np.mod(np.arctan2(sinE,cosE),2*np.pi)
 
-    #inclination
+    #inclination (strictly in (0,pi))
+    I = np.arccos(L[2]/Ls)
     sinI = np.sqrt(L[0]**2 + L[1]**2.)/Ls
-    cosI = L[2]/Ls
-    I = np.arctan2(sinI,cosI)
-
+  
     #argument of pericenter
     esinwsinI = (vs[0]*L[1] - vs[1]*L[0])/mus - rs[2]/r
     ecoswsinI = (Ls*vs[2,:])/mus - (L[0]*rs[1] - L[1]*rs[0])/(Ls*r)
-    w = np.arctan2(esinwsinI,ecoswsinI)
+    w = np.mod(np.arctan2(esinwsinI,ecoswsinI),2*np.pi)
 
     #longitude of ascending node
     cosO = -L[1]/(Ls*sinI)
     sinO = L[0]/(np.sqrt(L2s)*sinI)
-    O = np.arctan2(sinO,cosO)
+    O = np.mod(np.arctan2(sinO,cosO),2*np.pi)
 
     #orbital periods
     P = 2*np.pi*np.sqrt(a**3./mus)
@@ -281,7 +381,7 @@ def calcAB(a,e,O,I,w):
     
     return A,B
 
-def orbElem2vec(E,mus,orbElem=None,AB=None):
+def orbElem2vec(E,mus,orbElem=None,AB=None,returnAB=False):
     """ Convert Keplerian orbital elements to position and velocity vectors
 
     Args:
@@ -295,14 +395,16 @@ def orbElem2vec(E,mus,orbElem=None,AB=None):
             (a,e,O,I,w) Exact inputs to calcAB. Either this or AB input must be set
         AB (tuple):
             (A,B) Exact outpus from calcAB
+        returnAB (bool):
+            Default False. If True, returns (A,B) as thrid output.
 
     Returns:
         rs (ndarray):
-            3n x 1 stacked initial position vectors:
-              [r1(1);r1(2);r1(3);r2(1);r2(2)r2(3);...;rn(1);rn(2);rn(3)]
-            or 3 x n or n x 3 matrix of position vecotrs.
+            3 x n stacked position vectors
         vs (ndarray):
-            3n x 1 stacked initial velocity vectors or 3 x n or n x3 matrix
+            3 x n stacked velocity vectors 
+        AB (tuple):
+            (A,B)
 
     Notes:
         All units are complementary, i.e., if mus are in AU^3/day^2 then
@@ -344,9 +446,15 @@ def orbElem2vec(E,mus,orbElem=None,AB=None):
 
     if np.isscalar(mus) and not(np.isscalar(E)):
         r = np.matmul(A,np.array((np.cos(E) - e),ndmin=2)) + np.matmul(B,np.array(np.sin(E),ndmin=2))
+        v = (np.matmul(-A,np.array(np.sin(E),ndmin=2))+np.matmul(B,np.array(np.cos(E),ndmin=2)))*\
+             np.tile(np.sqrt(mus*a**(-3.))/(1 - e*np.cos(E)),(3,1))
+
     else:
         r = np.matmul(A,np.diag(np.cos(E) - e)) + np.matmul(B, np.diag(np.sin(E)))
         v = np.matmul(np.matmul(-A,np.diag(np.sin(E)))+np.matmul(B,np.diag(np.cos(E))),\
                       np.diag(np.sqrt(mus*a**(-3.))/(1 - e*np.cos(E))))
 
-    return r,v
+    if returnAB:
+        return r,v,(A,B)
+    else:
+        return r,v
