@@ -26,7 +26,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="keplertools",
-    version="0.1.0",
+    version="0.1.1",
     author="Dmitry Savransky",
     author_email="ds264@cornell.edu",
     description="Two-body orbital propagation tools",
