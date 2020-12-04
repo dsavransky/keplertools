@@ -10,6 +10,7 @@ cdef extern from "eccanom_C.h":
 cimport cython
 @cython.boundscheck(False)
 @cython.wraparound(False)
+@cython.nonecheck(False)
 def Cyeccanom(np.ndarray[DTYPE_t, ndim=1] M, np.ndarray[DTYPE_t, ndim=1] e, DTYPE_t epsmult, ITYPE_t maxIter):
     """Finds eccentric anomaly from mean anomaly and eccentricity
     
