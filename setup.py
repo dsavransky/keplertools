@@ -21,7 +21,7 @@ except ImportError:
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-with open(os.path.join("EXOSIMS","__init__.py"), "r") as f:
+with open(os.path.join("keplertools","__init__.py"), "r") as f:
     version_file = f.read()
 
 version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",\
