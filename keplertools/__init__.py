@@ -1,1 +1,2 @@
-name="keplertools"
+name = "keplertools"
+__version__ = "0.2.0"
