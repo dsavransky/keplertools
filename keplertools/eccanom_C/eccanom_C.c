@@ -32,18 +32,20 @@ int eccanom_C(double E[], double M[], double e[], double epsmult, int maxIter, i
     
     double tolerance = pow(2,log(1)/log(2) - 52.0)*epsmult;
     int numIter = 0;
-    double err = 1.0;
+    int maxnumIter = 0;
+    double err;
 
-    while ((err > tolerance) && (numIter < maxIter)) {
-        err = 0.0;
-        for (j = 0; j < n; j++){
+    for (j = 0; j < n; j++){
+        err = tolerance*2.0;
+        numIter = 0;
+        while ((err > tolerance) && (numIter < maxIter)) {
             E[j] = E[j] - (M[j] - E[j] + e[j]*sin(E[j]))/(e[j]*cos(E[j])-1);
-            tmp = fabs(M[j] - (E[j] - e[j]*sin(E[j])));
-            if (tmp > err){ err = tmp; }
+            err = fabs(M[j] - (E[j] - e[j]*sin(E[j])));
+            numIter += 1;
         }
-        numIter += 1;
+        if(numIter > maxnumIter){maxnumIter = numIter;}
     }
 
-    return numIter;
+    return maxnumIter;
 
 }

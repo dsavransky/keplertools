@@ -13,21 +13,21 @@ cimport cython
 @cython.nonecheck(False)
 def Cyeccanom(np.ndarray[DTYPE_t, ndim=1] M, np.ndarray[DTYPE_t, ndim=1] e, DTYPE_t epsmult, ITYPE_t maxIter):
     """Finds eccentric anomaly from mean anomaly and eccentricity
-    
-    This method uses Newton-Raphson iteration to find the eccentric 
+
+    This method uses Newton-Raphson iteration to find the eccentric
     anomaly from mean anomaly and eccentricity, assuming a closed (0<e<1)
     orbit.
-    
+
     Args:
         M (ndarray):
             mean anomaly (rad)
         e (ndarray):
-            eccentricity 
+            eccentricity
         epsmult (float):
             Precision of convergence (multiplied by precision of floating data type).
         maxiter (int):
             Maximum numbr of iterations.
-            
+
     Returns:
         E (float or ndarray):
             eccentric anomaly (rad)
@@ -37,8 +37,8 @@ def Cyeccanom(np.ndarray[DTYPE_t, ndim=1] M, np.ndarray[DTYPE_t, ndim=1] e, DTYP
     """
 
     cdef int n = M.size
-    
-    assert (M.dtype == DTYPE) and (e.dtype == DTYPE) and (e.size == n), "Incompatible inputs." 
+
+    assert (M.dtype == DTYPE) and (e.dtype == DTYPE) and (e.size == n), "Incompatible inputs."
 
     #initialize output array
     cdef np.ndarray[DTYPE_t, ndim=1] E =  np.zeros(n, dtype=DTYPE)
@@ -48,7 +48,3 @@ def Cyeccanom(np.ndarray[DTYPE_t, ndim=1] M, np.ndarray[DTYPE_t, ndim=1] e, DTYP
     assert (numIter < maxIter), "eccanom_C failed to converge."
 
     return E
-
-
-
-
