@@ -2,14 +2,13 @@ import numpy as np
 
 try:
     import keplertools.Cyeccanom
-
     haveCyeccanom = True
 except ImportError:
     haveCyeccanom = False
     pass
 
 
-def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False):
+def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False, verb=False):
     """Finds eccentric anomaly from mean anomaly and eccentricity
 
     This method uses Newton-Raphson iteration to find the eccentric
@@ -28,9 +27,12 @@ def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False):
         maxiter (int):
             Maximum numbr of iterations.  Optional, defaults to 100.
         returnIter (bool):
-            Return number of iterations (defaults false, only available in python version)
+            Return number of iterations (defaults false, only available in python
+            version, ignored if using C version)
         noc (bool):
             Don't use C version even if it can be loaded.
+        verb (bool):
+            Print exactly which version (C or Python is being used)
 
     Returns:
         tuple:
@@ -50,7 +52,10 @@ def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False):
 
     """
 
-    noc = noc and haveCyeccanom
+    if not (noc):
+        noc = not (haveCyeccanom)
+        if verb and not (haveCyeccanom):
+            print("C version requested, but not found")
 
     # make sure M and e are of the correct format.
     # if either is scalar, expand to match sizes
@@ -69,10 +74,12 @@ def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False):
     M = np.mod(M, 2 * np.pi)
 
     if noc:
+        if verb:
+            print("Using Python version.")
 
         # initial values for E
         E = M / (1 - e)
-        mask = e * E ** 2 > 6 * (1 - e)
+        mask = e * E**2 > 6 * (1 - e)
         E[mask] = (6 * M[mask] / e[mask]) ** (1.0 / 3.0)
 
         # Newton-Raphson setup
@@ -87,6 +94,8 @@ def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False):
         if numIter == maxIter:
             raise Exception("eccanom failed to converge. Final error of %e" % err)
     else:
+        if verb:
+            print("Using C version.")
         E = keplertools.Cyeccanom.Cyeccanom(M, e, epsmult, maxIter)
         returnIter = False
 
@@ -203,8 +212,8 @@ def vec2orbElem2(rs, vs, mus):
         if vs.shape[0] != 3:
             vs = vs.T
 
-    v2s = np.sum(vs ** 2.0, axis=0)  # orbital velocity squared
-    rmag = np.sqrt(np.sum(rs ** 2.0, axis=0))  # orbital radius
+    v2s = np.sum(vs**2.0, axis=0)  # orbital velocity squared
+    rmag = np.sqrt(np.sum(rs**2.0, axis=0))  # orbital radius
 
     hvec = np.vstack(
         (
@@ -220,18 +229,18 @@ def vec2orbElem2(rs, vs, mus):
         np.tile((v2s - mus / rmag) / mus, (3, 1)) * rs
         - np.tile(np.sum(rs * vs, axis=0) / mus, (3, 1)) * vs
     )  # eccentricity vector
-    nmag = np.sqrt(np.sum(nvec ** 2.0, axis=0))
-    e = np.sqrt(np.sum(evec ** 2.0, axis=0))
+    nmag = np.sqrt(np.sum(nvec**2.0, axis=0))
+    e = np.sqrt(np.sum(evec**2.0, axis=0))
 
     En = v2s / 2 - mus / rmag
     a = -mus / 2 / En
-    ell = a * (1 - e ** 2)
+    ell = a * (1 - e**2)
     if np.any(e == 1):
-        tmp = np.sum(hvec ** 2.0, axis=0) / mus
+        tmp = np.sum(hvec**2.0, axis=0) / mus
         ell[e == 1] = tmp[e == 1]
 
     # angles
-    I = np.arccos(hvec[2] / np.sqrt(np.sum(hvec ** 2.0, axis=0)))
+    I = np.arccos(hvec[2] / np.sqrt(np.sum(hvec**2.0, axis=0)))
     O = np.arccos(nvec[0] / nmag)
     O[nvec[2] < 0] = 2 * np.pi - O[nvec[2] < 0]
     w = np.arccos(np.sum(nvec * evec, axis=0) / e / nmag)
@@ -243,10 +252,10 @@ def vec2orbElem2(rs, vs, mus):
     E = np.mod(np.arctan2(sinE, cosE), 2 * np.pi)
 
     # orbital periods
-    P = 2 * np.pi * np.sqrt(a ** 3.0 / mus)
+    P = 2 * np.pi * np.sqrt(a**3.0 / mus)
 
     # time of periapsis crossing
-    tau = -(E - e * np.sin(E)) / np.sqrt(mus * a ** -3.0)
+    tau = -(E - e * np.sin(E)) / np.sqrt(mus * a**-3.0)
 
     return a, e, E, O, I, w, P, tau
 
@@ -317,8 +326,8 @@ def vec2orbElem(rs, vs, mus):
         if vs.shape[0] != 3:
             vs = vs.T
 
-    v2s = np.sum(vs ** 2.0, axis=0)  # orbital velocity squared
-    r = np.sqrt(np.sum(rs ** 2.0, axis=0))  # orbital radius
+    v2s = np.sum(vs**2.0, axis=0)  # orbital velocity squared
+    r = np.sqrt(np.sum(rs**2.0, axis=0))  # orbital radius
     Ws = 0.5 * v2s - mus / r  # Keplerian orbital energy
     a = -mus / 2.0 / Ws
     # semi-major axis
@@ -330,7 +339,7 @@ def vec2orbElem(rs, vs, mus):
             rs[0] * vs[1] - rs[1] * vs[0],
         )
     )  # angular momentum vector
-    L2s = np.sum(L ** 2.0, axis=0)  # angular momentum squared
+    L2s = np.sum(L**2.0, axis=0)  # angular momentum squared
     Ls = np.sqrt(L2s)  # angular momentum
     p = L2s / mus  # semi-parameter
     e = np.sqrt(1.0 - p / a)  # eccentricity
@@ -355,10 +364,10 @@ def vec2orbElem(rs, vs, mus):
     O = np.mod(np.arctan2(sinO, cosO), 2 * np.pi)
 
     # orbital periods
-    P = 2 * np.pi * np.sqrt(a ** 3.0 / mus)
+    P = 2 * np.pi * np.sqrt(a**3.0 / mus)
 
     # time of periapsis crossing
-    tau = -(E - e * np.sin(E)) / np.sqrt(mus * a ** -3.0)
+    tau = -(E - e * np.sin(E)) / np.sqrt(mus * a**-3.0)
 
     return a, e, E, O, I, w, P, tau
 
@@ -386,7 +395,8 @@ def calcAB(a, e, O, I, w):
             A (ndarray):
                 Components of eccentricity vector scaled by a
             B (ndarray):
-                Components of q vector (orthogonal to e and h) scaled by b (=a\sqrt{1-e^2})
+                Components of q vector (orthogonal to e and h) scaled by
+                b (=a\sqrt{1-e^2})
 
     Notes:
         All inputs must be of same size.  Outputs are 3xn for n input points.
@@ -407,12 +417,12 @@ def calcAB(a, e, O, I, w):
     B = np.vstack(
         (
             -a
-            * np.sqrt(1 - e ** 2)
+            * np.sqrt(1 - e**2)
             * (np.cos(O) * np.sin(w) + np.sin(O) * np.cos(I) * np.cos(w)),
             a
-            * np.sqrt(1 - e ** 2)
+            * np.sqrt(1 - e**2)
             * (-np.sin(O) * np.sin(w) + np.cos(O) * np.cos(I) * np.cos(w)),
-            a * np.sqrt(1 - e ** 2) * np.sin(I) * np.cos(w),
+            a * np.sqrt(1 - e**2) * np.sin(I) * np.cos(w),
         )
     )
 
