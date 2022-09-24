@@ -10,9 +10,10 @@ Two-body orbital propagation tools
 pip install keplertools
 ```
 
-To also compile the Cython versions:
+To also compile the Cython versions (compiler required, see here for details: https://cython.readthedocs.io/en/latest/src/quickstart/install.html):
 
 ```
-pip install keplertools[C]
+pip install --no-binary keplertools keplertools[C]
 ```
 
+If using a zsh shell (or depending on your specific shell setup), you may need to escape the square brackets (i.e., the last bit of the previous command would be ``keplertools\[C\]``.
