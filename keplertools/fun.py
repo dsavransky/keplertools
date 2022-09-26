@@ -1,14 +1,25 @@
 import numpy as np
+import numpy.typing as npt
+from typing import Union, Tuple, Optional
 
 try:
-    import keplertools.Cyeccanom
+    import keplertools.Cyeccanom  # type: ignore
+
     haveCyeccanom = True
 except ImportError:
     haveCyeccanom = False
     pass
 
 
-def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False, verb=False):
+def eccanom(
+    M: npt.ArrayLike,
+    e: npt.ArrayLike,
+    epsmult: float = 4.01,
+    maxIter: int = 100,
+    returnIter: bool = False,
+    noc: bool = False,
+    verb: bool = False,
+) -> Union[Tuple[npt.NDArray[np.float_], int], npt.NDArray[np.float_]]:
     """Finds eccentric anomaly from mean anomaly and eccentricity
 
     This method uses Newton-Raphson iteration to find the eccentric
@@ -102,10 +113,10 @@ def eccanom(M, e, epsmult=4.01, maxIter=100, returnIter=False, noc=False, verb=F
     if returnIter:
         return E, numIter
     else:
-        return E
+        return E  # type: ignore
 
 
-def trueanom(E, e):
+def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
     """Finds true anomaly from eccentric anomaly and eccentricity
 
     The implemented method corresponds to Eq. 6.28 in Green assuming a closed
@@ -143,10 +154,23 @@ def trueanom(E, e):
     nu = 2.0 * np.arctan(np.sqrt((1.0 + e) / (1.0 - e)) * np.tan(E / 2.0))
     nu[nu < 0] += 2 * np.pi
 
-    return nu
+    return nu  # type: ignore
 
 
-def vec2orbElem2(rs, vs, mus):
+def vec2orbElem2(
+    rs: npt.NDArray[np.float_],
+    vs: npt.NDArray[np.float_],
+    mus: Union[float, npt.NDArray[np.float_]],
+) -> Tuple[
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+]:
     """Convert position and velocity vectors to Keplerian orbital elements
 
     Implements the algorithm from Vallado
@@ -193,8 +217,9 @@ def vec2orbElem2(rs, vs, mus):
         vs.size == rs.size
     ), "rs and vs must be of the same size and contain 3n elements."
 
-    nplanets = rs.size / 3.0
-    assert np.isscalar(mus) or mus.size == nplanets, "mus must be scalar or of size n"
+    nplanets = int(rs.size / 3.0)
+    if not (np.isscalar(mus)):
+        assert mus.size == nplanets, "mus must be scalar or of size n"  # type: ignore
 
     assert rs.ndim < 3, "rs cannot have more than two dimensions"
     if rs.ndim == 1:
@@ -241,8 +266,7 @@ def vec2orbElem2(rs, vs, mus):
 
     # angles
     I = np.arccos(hvec[2] / np.sqrt(np.sum(hvec**2.0, axis=0)))
-    O = np.arccos(nvec[0] / nmag)
-    O[nvec[2] < 0] = 2 * np.pi - O[nvec[2] < 0]
+    O = np.mod(np.arctan2(nvec[1], nvec[0]), 2 * np.pi)
     w = np.arccos(np.sum(nvec * evec, axis=0) / e / nmag)
     w[evec[2] < 0] = 2 * np.pi - w[evec[2] < 0]
 
@@ -260,7 +284,20 @@ def vec2orbElem2(rs, vs, mus):
     return a, e, E, O, I, w, P, tau
 
 
-def vec2orbElem(rs, vs, mus):
+def vec2orbElem(
+    rs: npt.NDArray[np.float_],
+    vs: npt.NDArray[np.float_],
+    mus: Union[float, npt.NDArray[np.float_]],
+) -> Tuple[
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+    npt.NDArray[np.float_],
+]:
     """Convert position and velocity vectors to Keplerian orbital elements
 
     Implements the (corrected) algorithm from Vinti
@@ -307,8 +344,9 @@ def vec2orbElem(rs, vs, mus):
         vs.size == rs.size
     ), "rs and vs must be of the same size and contain 3n elements."
 
-    nplanets = rs.size / 3.0
-    assert np.isscalar(mus) or mus.size == nplanets, "mus must be scalar or of size n"
+    nplanets = int(rs.size / 3.0)
+    if not (np.isscalar(mus)):
+        assert mus.size == nplanets, "mus must be scalar or of size n"  # type: ignore
 
     assert rs.ndim < 3, "rs cannot have more than two dimensions"
     if rs.ndim == 1:
@@ -372,7 +410,13 @@ def vec2orbElem(rs, vs, mus):
     return a, e, E, O, I, w, P, tau
 
 
-def calcAB(a, e, O, I, w):
+def calcAB(
+    a: npt.NDArray[np.float_],
+    e: npt.NDArray[np.float_],
+    O: npt.NDArray[np.float_],
+    I: npt.NDArray[np.float_],
+    w: npt.NDArray[np.float_],
+) -> Tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
     """Calculate inertial frame components of perifocal frame unit vectors scaled
     by orbit semi-major and semi-minor axes.
 
@@ -429,7 +473,31 @@ def calcAB(a, e, O, I, w):
     return A, B
 
 
-def orbElem2vec(E, mus, orbElem=None, AB=None, returnAB=False):
+def orbElem2vec(
+    E: npt.NDArray[np.float_],
+    mus: Union[float, npt.NDArray[np.float_]],
+    orbElem: Optional[
+        Tuple[
+            npt.NDArray[np.float_],
+            npt.NDArray[np.float_],
+            npt.NDArray[np.float_],
+            npt.NDArray[np.float_],
+            npt.NDArray[np.float_],
+        ]
+    ] = None,
+    AB: Optional[Tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]] = None,
+    returnAB: bool = False,
+) -> Union[
+    Tuple[
+        npt.NDArray[np.float_],
+        npt.NDArray[np.float_],
+        Tuple[
+            npt.NDArray[np.float_],
+            npt.NDArray[np.float_],
+        ],
+    ],
+    Tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]],
+]:
     """Convert Keplerian orbital elements to position and velocity vectors
 
     Args:
@@ -478,7 +546,7 @@ def orbElem2vec(E, mus, orbElem=None, AB=None, returnAB=False):
         E = np.array(E, ndmin=1)
     else:
         assert np.isscalar(mus) or (
-            mus.size == E.size
+            mus.size == E.size  # type: ignore
         ), "mus must be of the same size as E or scalar."
     if orbElem is not None:
         assert AB is None, "You can only set orbElem or AB."
@@ -507,8 +575,9 @@ def orbElem2vec(E, mus, orbElem=None, AB=None, returnAB=False):
         v = (
             np.matmul(-A, np.array(np.sin(E), ndmin=2))
             + np.matmul(B, np.array(np.cos(E), ndmin=2))
-        ) * np.tile(np.sqrt(mus * a ** (-3.0)) / (1 - e * np.cos(E)), (3, 1))
-
+        ) * np.tile(
+            np.sqrt(mus * a ** (-3.0)) / (1 - e * np.cos(E)), (3, 1)  # type:ignore
+        )
     else:
         r = np.matmul(A, np.diag(np.cos(E) - e)) + np.matmul(B, np.diag(np.sin(E)))
         v = np.matmul(
