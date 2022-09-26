@@ -178,11 +178,11 @@ def vec2orbElem2(
     Args:
         rs (ndarray):
             3n x 1 stacked initial position vectors:
-              [r1(1);r1(2);r1(3);r2(1);r2(2)r2(3);...;rn(1);rn(2);rn(3)]
-            or 3 x n or n x 3 matrix of position vecotrs.
+            [r1(1);r1(2);r1(3);r2(1);r2(2)r2(3);...;rn(1);rn(2);rn(3)]
+            or 3 x n or n x 3 matrix of position vectprs.
         vs (ndarray):
             3n x 1 stacked initial velocity vectors or 3 x n or n x3 matrix
-        mus (ndarray or float)
+        mus (ndarray or float):
             nx1 array of gravitational parameters (G*m_i) where G is the
             gravitational constant and m_i is the mass of the ith body.
             if all vectors represent the same body, mus may be a scalar.
@@ -305,11 +305,11 @@ def vec2orbElem(
     Args:
         rs (ndarray):
             3n x 1 stacked initial position vectors:
-              [r1(1);r1(2);r1(3);r2(1);r2(2)r2(3);...;rn(1);rn(2);rn(3)]
-            or 3 x n or n x 3 matrix of position vecotrs.
+            [r1(1);r1(2);r1(3);r2(1);r2(2)r2(3);...;rn(1);rn(2);rn(3)]
+            or 3 x n or n x 3 matrix of position vectors.
         vs (ndarray):
             3n x 1 stacked initial velocity vectors or 3 x n or n x3 matrix
-        mus (ndarray or float)
+        mus (ndarray or float):
             nx1 array of gravitational parameters (G*m_i) where G is the
             gravitational constant and m_i is the mass of the ith body.
             if all vectors represent the same body, mus may be a scalar.
@@ -332,7 +332,6 @@ def vec2orbElem(
                 orbital periods
             tau (ndarray):
                 time of periapsis crossing
-
 
     Notes:
         All units must be complementary, i.e., if positions are in AU, and time is in
@@ -501,12 +500,12 @@ def orbElem2vec(
     """Convert Keplerian orbital elements to position and velocity vectors
 
     Args:
-        E (ndarray)
+        E (ndarray):
             nx1 array of eccentric anomalies (rad)
-        mus (ndarray or float)
-            nx1 array of gravitational parameters (G*m_i) where G is the
-            gravitational constant and m_i is the mass of the ith body.
-            if all vectors represent the same body, mus may be a scalar.
+        mus (ndarray or float):
+            nx1 array of gravitational parameters (G*m_i) where G is the gravitational
+            constant and m_i is the mass of the ith body. if all vectors represent the
+            same body, mus may be a scalar.
         orbElem (tuple):
             (a,e,O,I,w) Exact inputs to calcAB. Either this or AB input must be set
         AB (tuple):
@@ -528,10 +527,13 @@ def orbElem2vec(
         positions will be in AU, and velocities will be AU/day.
 
         Possible combinations or inputs are:
+
         1. E scalar, mu scalar - single body, single position.
            A, B should be 3x1 (or orbElem should be all scalars).
+
         2. E vector, mu scalar - single body, many orbital positions.
            A, B should be 3x1 (or orbElem should be all scalars).
+
         3. E vector, mu vector - multiple bodies at varying orbital positions.
            A, B should be 3xn where E.size==n (or all orbElem should be size n)
            and mus.size must equal E.size.
