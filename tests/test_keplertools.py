@@ -6,6 +6,9 @@ from keplertools.fun import (
     vec2orbElem2,
     calcAB,
     orbElem2vec,
+    invKepler,
+    kepler2orbstate,
+    orbstate2kepler,
 )
 import numpy as np
 
@@ -219,6 +222,7 @@ class TestKeplerTools(unittest.TestCase):
         self.assertTrue(np.max(np.abs(E - E1)) < self.angtol)
 
     def test_trueanom(self):
+        """Test True anomaly calculation"""
         n = self.n
         E = np.random.rand(n) * 2 * np.pi
         e = np.random.rand(n)
@@ -230,3 +234,102 @@ class TestKeplerTools(unittest.TestCase):
             )
             < 1e-9
         )
+
+    def test_invkepler(self):
+        """Test generalized kepler inverse function"""
+
+        # first closed orbits
+        M = np.random.rand(self.n) * 2 * np.pi
+        e = np.linspace(0, 1 - self.etol, self.n)
+
+        E, _, nu = invKepler(M, e, return_nu=True)
+
+        self.assertTrue(
+            np.max(
+                np.abs(e + (1 - e**2) / (1 + e * np.cos(nu)) * np.cos(nu) - np.cos(E))
+            )
+            < self.etol
+        )
+
+        # now hyperbolae
+        M = np.random.rand(self.n) * 200 - 100
+        e = np.linspace(1 + self.etol, 25, self.n)
+
+        H, _, nu = invKepler(M, e, return_nu=True)
+
+        self.assertTrue(
+            np.max(
+                np.abs(
+                    np.sqrt(e**2 - 1) * np.sinh(H) / (e * np.cosh(H) - 1) - np.sin(nu)
+                )
+            )
+            < self.etol
+        )
+
+        # and some parabolae
+        B, _, nu = invKepler(M, np.ones(self.n), return_nu=True)
+
+        self.assertTrue(np.max(np.abs(B + B**3 / 3 - M)) < self.etol)
+
+    def test_kepler_orbstate_roundtrip(self):
+        """Test conversion back and forth between orbital state and Keplerian elements"""
+
+        # semi-major axes uniformly distributed in -1,1
+        a0 = np.random.rand(self.n) * 2 - 1
+        e0 = np.zeros(self.n)  # assign eccentricities by orbit type
+        closed = a0 > 0
+        nclosed = len(np.where(closed)[0])
+        e0[closed] = np.random.rand(nclosed)
+        e0[~closed] = (np.random.rand(self.n - nclosed) + 1) * 5
+
+        # force a few orbits to be parabolic and circular
+        e0[np.where(closed)[0][:100]] = 0
+        e0[np.where(~closed)[0][:100]] = 1
+        a0[np.where(~closed)[0][:100]] *= -1
+
+        mu = 1  # arbitrary mu, same for all orbits
+        n = np.sqrt(1 / np.abs(a0) ** 3)  # mean motion
+        n[e0 == 1] *= 2  # Treat a as semi-parameter for parabolae
+        M0 = np.random.randn(self.n) * np.pi / 2  # randomize initial mean anomaly
+        E0, _, nu0 = invKepler(M0, e0, return_nu=True)
+
+        # randomly distribute orientation angles
+        O0 = np.random.rand(self.n) * 2 * np.pi
+        w0 = np.random.rand(self.n) * 2 * np.pi
+        I0 = np.arccos(np.random.rand(self.n) * 2 - 1)
+        # ensure a few zero inclination and a few pi:
+        I0[np.random.choice(self.n, 50)] = 0
+        I0[np.random.choice(self.n, 50)] = np.pi
+
+        # Evaluate initial conditions and invert
+        r0, v0 = kepler2orbstate(a0, e0, O0, I0, w0, mu, nu0)
+        a1, e1, O1, I1, w1, _ = orbstate2kepler(r0, v0, mu)
+
+        # handle special cases:
+        zeroI = I0 == 0
+        zeroe = e0 == 0
+        zeroeI = zeroI & zeroe
+        zeroI[zeroeI] = False
+        zeroe[zeroeI] = False
+
+        # e = I = 0: nu, w, Omega indistinguishable.  Put everything in nu and set w=O=0
+        if np.any(zeroeI):
+            nu0[zeroeI] = np.mod(nu0[zeroeI] + w0[zeroeI] + O0[zeroeI], 2 * np.pi)
+            w0[zeroeI] = 0
+            O0[zeroeI] = 0
+
+        # I = 0: w, Omega indistinguishable. Put everything in omega and set O = 0
+        if np.any(zeroI):
+            w0[zeroI] = np.mod(w0[zeroI] + O0[zeroI], 2 * np.pi)
+            O0[zeroI] = 0
+
+        # e = 0: w, nu indistinguishable. Put everything in nu and set w = 0
+        if np.any(zeroe):
+            nu0[zeroe] = np.mod(w0[zeroe] + nu0[zeroe], 2 * np.pi)
+            w0[zeroe] = 0
+
+        self.assertTrue(np.all(np.abs(a0 - a1) < np.sqrt(np.spacing(np.abs(a0)))))
+        self.assertTrue(np.max(np.abs(e0 - e1)) < self.etol)
+        self.assertTrue(np.max(np.abs(O0 - O1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(w0 - w1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(I0 - I1)) < self.angtol)
