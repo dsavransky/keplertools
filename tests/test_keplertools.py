@@ -126,7 +126,7 @@ class TestKeplerTools(unittest.TestCase):
 
         # generate one body full orbit
         a = np.random.rand(1)[0] * 100
-        e = np.random.rand(1)[0]
+        e = np.random.rand(1)[0] * 0.95
         O = np.random.rand(1)[0] * 2 * np.pi
         I = np.random.rand(1)[0] * np.pi
         w = np.random.rand(1)[0] * 2 * np.pi
@@ -138,26 +138,24 @@ class TestKeplerTools(unittest.TestCase):
         rs, vs, ABs = orbElem2vec(E, 1.0, orbElem=(a, e, O, I, w), returnAB=True)
         a1, e1, E1, O1, I1, w1, P1, tau1 = vec2orbElem(rs, vs, 1.0)
 
-        tol = np.spacing(np.max(np.abs(np.linalg.norm(rs, axis=0)))) * 10000
-
         # check that you got back what you put in
-        self.assertTrue(np.max(np.abs(a - a1)) < tol)
-        self.assertTrue(np.max(np.abs(e - e1)) < tol)
-        self.assertTrue(np.max(np.abs(O - O1)) < tol)
-        self.assertTrue(np.max(np.abs(w - w1)) < tol)
-        self.assertTrue(np.max(np.abs(I - I1)) < tol)
-        self.assertTrue(np.max(np.abs(E - E1)) < tol)
+        self.assertTrue(np.all(np.abs(a - a1) < np.sqrt(np.spacing(a))))
+        self.assertTrue(np.max(np.abs(e - e1)) < self.etol)
+        self.assertTrue(np.max(np.abs(O - O1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(w - w1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(I - I1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(E - E1)) < self.angtol)
 
         # convert back and forth again using A,B
         rs, vs = orbElem2vec(E, 1.0, AB=ABs)
         a1, e1, E1, O1, I1, w1, P1, tau1 = vec2orbElem(rs, vs, 1.0)
 
-        self.assertTrue(np.max(np.abs(a - a1)) < tol)
-        self.assertTrue(np.max(np.abs(e - e1)) < tol)
-        self.assertTrue(np.max(np.abs(O - O1)) < tol)
-        self.assertTrue(np.max(np.abs(w - w1)) < tol)
-        self.assertTrue(np.max(np.abs(I - I1)) < tol)
-        self.assertTrue(np.max(np.abs(E - E1)) < tol)
+        self.assertTrue(np.all(np.abs(a - a1) < np.sqrt(np.spacing(a))))
+        self.assertTrue(np.max(np.abs(e - e1)) < self.etol)
+        self.assertTrue(np.max(np.abs(O - O1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(w - w1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(I - I1)) < self.angtol)
+        self.assertTrue(np.max(np.abs(E - E1)) < self.angtol)
 
     def test_orbElem2vec_Nbody(self):
         """Test state vector generation for multiple bodies"""
@@ -219,7 +217,6 @@ class TestKeplerTools(unittest.TestCase):
         self.assertTrue(np.max(np.abs(w - w1)) < self.angtol)
         self.assertTrue(np.max(np.abs(I - I1)) < self.angtol)
         self.assertTrue(np.max(np.abs(E - E1)) < self.angtol)
-
 
     def test_trueanom(self):
         n = self.n
