@@ -4,6 +4,8 @@ Two-body orbital propagation tools
 ![Build Status](https://github.com/dsavransky/keplertools/actions/workflows/ci.yml/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/dsavransky/keplertools/badge.svg?branch=main)](https://coveralls.io/github/dsavransky/keplertools?branch=main)
 [![Documentation Status](https://readthedocs.org/projects/keplertools/badge/?version=latest)](https://keplertools.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/cornellGrading.svg)](https://badge.fury.io/py/cornellGrading)
+[![Requirements Status](https://requires.io/github/dsavransky/grading/requirements.svg?branch=main)](https://requires.io/github/dsavransky/grading/requirements/?branch=main)
 
 ## Installation
 
