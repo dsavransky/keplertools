@@ -18,3 +18,7 @@ pip install --no-binary keplertools keplertools[C]
 ```
 
 If using a zsh shell (or depending on your specific shell setup), you may need to escape the square brackets (i.e., the last bit of the previous command would be ``keplertools\[C\]``.
+
+## Documentation
+
+https://keplertools.readthedocs.io/

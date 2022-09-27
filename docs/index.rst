@@ -23,6 +23,25 @@ To also compile the Cython versions (compiler required, for details see: https:/
 
 If using a zsh shell (or depending on your specific shell setup), you may need to escape the square brackets (i.e., the last bit of the previous command would be ``keplertools\[C\]``.
 
+Closed-Orbit Methods
+----------------------
+The following methods are for use with closed orbits:
+
+* :py:meth:`~keplertools.fun.eccanom`
+* :py:meth:`~keplertools.fun.trueanom`
+* :py:meth:`~keplertools.fun.vec2orbElem`
+* :py:meth:`~keplertools.fun.vec2orbElem2`
+* :py:meth:`~keplertools.fun.orbElem2vec`
+
+All-Orbit Methods
+------------------
+The following methods support all orbits (open and closed):
+
+* :py:meth:`~keplertools.fun.invKepler`
+* :py:meth:`~keplertools.fun.kepler2orbstate`
+* :py:meth:`~keplertools.fun.orbstate2kepler`
+* :py:meth:`~keplertools.fun.universalfg`
+* :py:class:`~keplertools.keplerSTM.planSys`
 
 .. toctree::
    :maxdepth: 2
