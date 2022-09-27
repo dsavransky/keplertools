@@ -9,6 +9,7 @@ from keplertools.fun import (
     invKepler,
     kepler2orbstate,
     orbstate2kepler,
+    universalfg,
 )
 import numpy as np
 
@@ -333,3 +334,53 @@ class TestKeplerTools(unittest.TestCase):
         self.assertTrue(np.max(np.abs(O0 - O1)) < self.angtol)
         self.assertTrue(np.max(np.abs(w0 - w1)) < self.angtol)
         self.assertTrue(np.max(np.abs(I0 - I1)) < self.angtol)
+
+    def test_universalfg(self):
+        """Test f and g propagation"""
+
+        # semi-major axes uniformly distributed in -1,1
+        a0 = np.random.rand(self.n) * 2 - 1
+        e0 = np.zeros(self.n)  # assign eccentricities by orbit type
+        closed = a0 > 0
+        nclosed = len(np.where(closed)[0])
+        e0[closed] = np.random.rand(nclosed)
+        e0[~closed] = (np.random.rand(self.n - nclosed) + 1) * 5
+
+        # force a few orbits to be parabolic and circular
+        e0[np.where(closed)[0][:100]] = 0
+        e0[np.where(~closed)[0][:100]] = 1
+        a0[np.where(~closed)[0][:100]] *= -1
+
+        mu = 1  # arbitrary mu, same for all orbits
+        n = np.sqrt(1 / np.abs(a0) ** 3)  # mean motion
+        n[e0 == 1] *= 2  # Treat a as semi-parameter for parabolae
+        M0 = np.random.randn(self.n) * np.pi / 2  # randomize initial mean anomaly
+        _, _, nu0 = invKepler(M0, e0, return_nu=True, convergence_error=False)
+        M1 = M0 + n * 1  # 1 time unit later
+        _, _, nu1 = invKepler(M1, e0, return_nu=True, convergence_error=False)
+
+        # randomly distribute orientation angles
+        O0 = np.random.rand(self.n) * 2 * np.pi
+        w0 = np.random.rand(self.n) * 2 * np.pi
+        I0 = np.arccos(np.random.rand(self.n) * 2 - 1)
+        # ensure a few zero inclination and a few pi:
+        I0[np.random.choice(self.n, 50)] = 0
+        I0[np.random.choice(self.n, 50)] = np.pi
+
+        # Evaluate initial and final conditions
+        r0, v0 = kepler2orbstate(a0, e0, O0, I0, w0, mu, nu0)
+        r1, v1 = kepler2orbstate(a0, e0, O0, I0, w0, mu, nu1)
+
+        # Now propgate via f and g for 1 time unit
+        r1fg, v1fg, counter = universalfg(
+            r0, v0, mu, 1, return_counter=True, convergence_error=False
+        )
+
+        r1mag = np.sqrt(np.sum(r1 * r1, axis=1))
+
+        self.assertTrue(
+            np.all(
+                np.sqrt(np.sum((r1fg[counter < 100] - r1[counter < 100]) ** 2, axis=1))
+                < np.sqrt(np.spacing(r1mag[counter < 100]))
+            )
+        )

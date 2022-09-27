@@ -106,7 +106,7 @@ def eccanom(
             numIter += 1
 
         if numIter == maxIter:
-            raise Exception("eccanom failed to converge. Final error of %e" % err)
+            raise ValueError("eccanom failed to converge. Final error of %e" % err)
     else:
         if verb:
             print("Using C version.")
@@ -799,7 +799,7 @@ def invKepler(
 
         if np.max(counter) == maxIter:
             if convergence_error:
-                raise Exception("Maximum number of iterations exceeded")
+                raise ValueError("Maximum number of iterations exceeded")
             else:
                 warnings.warn("Maximum number of iterations exceeded")
 
@@ -1191,6 +1191,7 @@ def universalfg(
     dt: floatORarray,
     maxIter: int = 100,
     return_counter: bool = False,
+    convergence_error: bool = True,
 ) -> Tuple[npt.NDArray[np.float_], ...]:
     """Propagate orbital state vectors by delta t via universal variable-based f and g
 
@@ -1210,6 +1211,9 @@ def universalfg(
         return_counter (bool):
             If True, returns the number of iterations for each input state. Defaults
             False.
+        convergence_error (bool):
+            Raise error on convergence failure if True. Defaults True.
+
 
     Returns:
         tuple:
@@ -1240,7 +1244,7 @@ def universalfg(
     fac0 = r0dotv0 / np.sqrt(mu)  # r_0 \cdot v_0 / \sqrt{mu}
 
     # classify by orbit type
-    epsval = 100 * np.spacing(1)
+    epsval = 1000 * np.spacing(1)
     eorbs = alpha >= epsval
     porbs = np.abs(alpha) < epsval
     horbs = alpha <= -epsval
@@ -1306,7 +1310,7 @@ def universalfg(
     r: npt.NDArray[np.float_] = r0mag.copy()  # type here to prevent ambiguity later
     chiup = np.ones(len(r0))
     # the tolerance is set by the current magnitudes of chi and r
-    currtol = 4 * np.spacing(np.max(np.abs(np.vstack((chi, r))), axis=0))
+    currtol = 10 * np.spacing(np.max(np.abs(np.vstack((chi, r))), axis=0))
     # we will only update things that haven't hit their tolerance:
     inds = np.abs(chiup) > currtol
 
@@ -1330,14 +1334,18 @@ def universalfg(
         ) / r[inds]
         chi[inds] += chiup[inds]
 
-        currtol[inds] = 4 * np.spacing(
+        currtol[inds] = 10 * np.spacing(
             np.max(np.abs(np.vstack((chi[inds], r[inds]))), axis=0)
         )
+        currtol[currtol > 1] = 1  # prevent runaway
         counter[inds] += 1
         inds = np.abs(chiup) > currtol
 
     if np.any(counter == maxIter):
-        raise ValueError("Failed to converge on chi")
+        if convergence_error:
+            raise ValueError("Failed to converge on chi")
+        else:
+            warnings.warn("Failed to converge on chi")
 
     # Evaluate f and g functions
     psi = chi**2.0 * alpha
