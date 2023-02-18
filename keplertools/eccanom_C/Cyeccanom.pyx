@@ -6,6 +6,7 @@ ctypedef np.int_t ITYPE_t
 
 cdef extern from "eccanom_C.h":
     int eccanom_C(double* E, double* M, double* e, double epsmult, int maxIter, int n)
+    int eccanom_orvara(double* E, double* sinE, double* cosE, double* M, double e, int n)
 
 cimport cython
 @cython.boundscheck(False)
@@ -48,3 +49,44 @@ def Cyeccanom(np.ndarray[DTYPE_t, ndim=1] M, np.ndarray[DTYPE_t, ndim=1] e, DTYP
     assert (numIter < maxIter), "eccanom_C failed to converge."
 
     return E
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+def Cyeccanom_orvara(np.ndarray[DTYPE_t, ndim=1] M, DTYPE_t e):
+    """Finds eccentric anomaly E, sinE, and cosE from mean anomaly and
+    eccentricity
+
+    This uses the method described the orvara paper which uses a 5th order
+    polynomial to approximate E and does a single Newton-Raphson iteration to
+    refine it.
+
+    Args:
+        M (ndarray):
+            mean anomaly (rad)
+        e (float):
+            eccentricity
+
+    Returns:
+        E (ndarray):
+            eccentric anomaly (rad)
+        sinE (ndarray):
+            Sine of eccentric anomaly
+        cosE (ndarray):
+            Cosine of eccentric anomaly
+
+    Notes:
+        Currently only works for a single orbit since it relies on creating a
+        lookup table for a single orbit. A loop can be added.
+    """
+
+    cdef int n = M.size
+
+    #initialize output array
+    cdef np.ndarray[DTYPE_t, ndim=1] E =  np.zeros(n, dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=1] sinE =  np.zeros(n, dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=1] cosE =  np.zeros(n, dtype=DTYPE)
+
+    eccanom_orvara(<double*> E.data,<double*> sinE.data, <double*> cosE.data, <double*> M.data, e, n)
+
+    return E, sinE, cosE

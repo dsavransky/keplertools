@@ -1,7 +1,8 @@
+import warnings
+from typing import Optional, Tuple, Union
+
 import numpy as np
 import numpy.typing as npt
-from typing import Union, Tuple, Optional
-import warnings
 
 floatORarray = Union[float, npt.NDArray[np.float_]]
 
@@ -117,6 +118,50 @@ def eccanom(
         return E, numIter
     else:
         return E  # type: ignore
+
+
+def eccanom_orvara(
+    M: npt.ArrayLike,
+    e: float,
+) -> Union[
+    Tuple[npt.NDArray[np.float_], int],
+    Tuple[npt.NDArray[np.float_], int],
+    Tuple[npt.NDArray[np.float_], int],
+]:
+    """Finds eccentric anomaly E, sinE, cosE from mean anomaly and eccentricity
+
+    This uses the method described the orvara paper which uses a 5th order
+    polynomial to approximate E and does a single Newton-Raphson iteration to
+    refine it.
+
+    Args:
+        M (float or ndarray):
+            mean anomaly (rad)
+        e (float or ndarray):
+            eccentricity (eccentricity may be a scalar if M is given as
+            an array, but otherwise must match the size of M.)
+
+    Returns:
+        tuple:
+            E (float or ndarray):
+                eccentric anomaly (rad)
+            sinE (float or ndarray):
+                Sine of eccentric anomaly (rad)
+            cosE (float or ndarray):
+                Cosine of eccentric anomaly (rad)
+
+    Notes:
+        Currently only works for a single orbit since it relies on creating a
+        lookup table for a single orbit. A loop can be added.
+
+    """
+
+    # force M into [0, 2*pi)
+    M = np.mod(M, 2 * np.pi)
+
+    E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
+
+    return E, sinE, cosE
 
 
 def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
