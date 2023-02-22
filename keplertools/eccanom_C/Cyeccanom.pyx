@@ -6,7 +6,7 @@ ctypedef np.int_t ITYPE_t
 
 cdef extern from "eccanom_C.h":
     int eccanom_C(double* E, double* M, double* e, double epsmult, int maxIter, int n)
-    int eccanom_orvara(double* E, double* sinE, double* cosE, double* M, double e, int n)
+    void eccanom_orvara(double* E, double* sinE, double* cosE, double* M, double e, int n)
 
 cimport cython
 @cython.boundscheck(False)

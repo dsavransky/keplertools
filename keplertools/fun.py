@@ -14,6 +14,8 @@ except ImportError:
     haveCyeccanom = False
     pass
 
+import keplertools.CyRV
+
 
 def eccanom(
     M: npt.ArrayLike,
@@ -152,7 +154,7 @@ def eccanom_orvara(
 
     Notes:
         Currently only works for a single orbit since it relies on creating a
-        lookup table for a single orbit. A loop can be added.
+        lookup table for a single orbit.
 
     """
 
@@ -1411,3 +1413,78 @@ def universalfg(
         out += (counter,)
 
     return out
+
+
+def calc_RV_from_M(
+    M: npt.ArrayLike,
+    e: npt.ArrayLike,
+    w: npt.ArrayLike,
+    K: npt.ArrayLike,
+):
+    """Calculate the combined radial velocity of a system of n objects at the
+    m epochs.
+
+    Args:
+        M (numpy.ndarray):
+            Mean anomalies of the objects at desired epochs (n x m) (rad)
+        e (numpy.ndarray):
+            Eccentricities of the objects (n x 1)
+        w (numpy.ndarray):
+            Argument of periapsis of the objects (n x 1) (rad)
+        K (numpy.ndarray):
+            Semi-amplitudes of the objects (n x 1) (m/s)
+
+    Returns:
+        rv (numpy.ndarray):
+            System radial velocities at desired epochs
+
+    """
+
+    rv = np.zeros(M.shape[1])
+    for nplanet in range(M.shape[0]):
+        E, sinE, cosE = eccanom_orvara(M[nplanet, :], e[nplanet])
+
+        # Get the object's rv added to the array
+        rv = keplertools.CyRV.CyRV_from_E(
+            rv, E, sinE, cosE, e[nplanet], w[nplanet], K[nplanet]
+        )
+    return rv
+
+
+def calc_RV_from_time(
+    t: npt.ArrayLike,
+    tp: npt.ArrayLike,
+    per: npt.ArrayLike,
+    e: npt.ArrayLike,
+    w: npt.ArrayLike,
+    K: npt.ArrayLike,
+):
+    """Calculate the combined radial velocity of a system of n objects at the
+    m epochs.
+
+    Args:
+        t (numpy.ndarray):
+            Epochs in jd (m x 1)
+        tp (numpy.ndarray):
+            Time of periastrons of the objects (n x 1)
+        e (numpy.ndarray):
+            Eccentricities of the objects (n x 1)
+        w (numpy.ndarray):
+            Argument of periapsis of the objects (n x 1) (rad)
+        K (numpy.ndarray):
+            Semi-amplitudes of the objects (n x 1) (m/s)
+
+    Returns:
+        rv (numpy.ndarray):
+            System radial velocities at desired epochs
+
+    """
+
+    rv = np.zeros(len(t))
+    keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+    # for nplanet in range(len(e)):
+    #     # Get the object's rv added to the array
+    #     rv = keplertools.CyRV.CyRV_from_time(
+    #         rv, t, tp[nplanet], per[nplanet], e[nplanet], w[nplanet], K[nplanet]
+    #     )
+    return rv

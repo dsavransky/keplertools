@@ -12,6 +12,11 @@ try:
                   setuptools.Extension("keplertools.Cyeccanom",
                                        [os.path.join("keplertools","eccanom_C","Cyeccanom.pyx"),
                                         os.path.join("keplertools","eccanom_C","eccanom_C.c")],
+                                       include_dirs = [numpy.get_include()]),
+                  setuptools.Extension("keplertools.CyRV",
+                                       [os.path.join("keplertools","RV_C","CyRV.pyx"),
+                                       os.path.join("keplertools","RV_C","RV_C.c"),
+                                       os.path.join("keplertools","eccanom_C","eccanom_C.c")],
                                        include_dirs = [numpy.get_include()])]
     extensions = cythonize(extensions)
 except ImportError:
