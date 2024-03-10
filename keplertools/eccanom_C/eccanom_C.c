@@ -2,6 +2,28 @@
 #include <stdio.h>
 #include <string.h>
 
+static const double one_sixth = 1. / 6;
+static const double if3 = 1. / 6;
+static const double if5 = 1. / (6. * 20);
+static const double if7 = 1. / (6. * 20 * 42);
+static const double if9 = 1. / (6. * 20 * 42 * 72);
+static const double if11 = 1. / (6. * 20 * 42 * 72 * 110);
+static const double if13 = 1. / (6. * 20 * 42 * 72 * 110 * 156);
+static const double if15 = 1. / (6. * 20 * 42 * 72 * 110 * 156 * 210);
+static const double pi = 3.14159265358979323846264338327950288;
+static const double two_pi = 2. * pi;
+static const double pi_d_12 = pi / 12;
+static const double pi_d_6 = pi / 6;
+static const double pi_d_4 = pi / 4;
+static const double pi_d_3 = pi / 3;
+static const double fivepi_d_12 = pi * 5. / 12;
+static const double pi_d_2 = pi / 2;
+static const double sevenpi_d_12 = pi * 7. / 12;
+static const double twopi_d_3 = pi * 2. / 3;
+static const double threepi_d_4 = pi * 3. / 4;
+static const double fivepi_d_6 = pi * 5. / 6;
+static const double elevenpi_d_12 = pi * 11. / 12;
+
 /*=================================================================
  * eccanom_C     Invert Kepler's time equation for elliptical orbits
  *               using Newton-Raphson iteration.
@@ -52,32 +74,37 @@ int eccanom_C(double E[], double M[], double e[], double epsmult, int maxIter,
   return maxnumIter;
 }
 
+/*=================================================================
+ * getbounds    Creates the lookup table for the bounds of the eccentric anomaly
+ *              and the coefficients for the Taylor series expansion of the
+ *              eccentric anomaly, based on a given eccentricity.
+ *              of calculating positions and velocities in elliptical orbits.
+ *
+ * getbounds(bounds, E_tab, e)
+ *   bounds    13x1    Output array containing the bounds for the eccentric
+ *                     anomaly intervals.
+ *   E_tab     78x1    Output array containing the lookup table of polynomial
+ *                     coefficients used to calculate the eccentric anomaly
+ *                     within the 13 different intervals defined by bounds.
+ *   e         1x1     Eccentricity of the orbit.
+ *=================================================================*/
+
 void getbounds(double bounds[], double E_tab[], double e) {
   // Taken from https://github.com/t-brandt/orvara
+  // Creates the lookup table for the bounds of the eccentric anomaly
+  // and the coefficients for the Taylor series expansion of the
+  // eccentric anomaly.
 
-  const double pi = 3.14159265358979323846264338327950288;
-  const double pi_d_12 = 3.14159265358979323846264338327950288 / 12;
-  const double pi_d_6 = 3.14159265358979323846264338327950288 / 6;
-  const double pi_d_4 = 3.14159265358979323846264338327950288 / 4;
-  const double pi_d_3 = 3.14159265358979323846264338327950288 / 3;
-  const double fivepi_d_12 = 3.14159265358979323846264338327950288 * 5. / 12;
-  const double pi_d_2 = 3.14159265358979323846264338327950288 / 2;
-  const double sevenpi_d_12 = 3.14159265358979323846264338327950288 * 7. / 12;
-  const double twopi_d_3 = 3.14159265358979323846264338327950288 * 2. / 3;
-  const double threepi_d_4 = 3.14159265358979323846264338327950288 * 3. / 4;
-  const double fivepi_d_6 = 3.14159265358979323846264338327950288 * 5. / 6;
-  const double elevenpi_d_12 = 3.14159265358979323846264338327950288 * 11. / 12;
-
-  double g2s_e = 0.2588190451025207623489 * e;
-  double g3s_e = 0.5 * e;
-  double g4s_e = 0.7071067811865475244008 * e;
-  double g5s_e = 0.8660254037844386467637 * e;
-  double g6s_e = 0.9659258262890682867497 * e;
-  double g2c_e = g6s_e;
-  double g3c_e = g5s_e;
-  double g4c_e = g4s_e;
-  double g5c_e = g3s_e;
-  double g6c_e = g2s_e;
+  const double g2s_e = 0.2588190451025207623489 * e;
+  const double g3s_e = 0.5 * e;
+  const double g4s_e = 0.7071067811865475244008 * e;
+  const double g5s_e = 0.8660254037844386467637 * e;
+  const double g6s_e = 0.9659258262890682867497 * e;
+  const double g2c_e = g6s_e;
+  const double g3c_e = g5s_e;
+  const double g4c_e = g4s_e;
+  const double g5c_e = g3s_e;
+  const double g6c_e = g2s_e;
 
   bounds[0] = 0;
   bounds[1] = pi_d_12 - g2s_e;
@@ -139,6 +166,8 @@ void getbounds(double bounds[], double E_tab[], double e) {
   double B0, B1, B2, idx;
   int i, k;
   for (i = 0; i < 12; i++) {
+    // For each interval, calculate the coefficients that have not already been
+    // calculated and add to the lookup table E_tab
     idx = 1. / (bounds[i + 1] - bounds[i]);
     k = 6 * i;
     E_tab[k] = i * pi_d_12;
@@ -157,17 +186,7 @@ void getbounds(double bounds[], double E_tab[], double e) {
 
 inline double shortsin(double x) {
   // Taken from https://github.com/t-brandt/orvara
-
-  const double if3 = 1. / 6;
-  const double if5 = 1. / (6. * 20);
-  const double if7 = 1. / (6. * 20 * 42);
-  const double if9 = 1. / (6. * 20 * 42 * 72);
-  const double if11 = 1. / (6. * 20 * 42 * 72 * 110);
-  const double if13 = 1. / (6. * 20 * 42 * 72 * 110 * 156);
-  const double if15 = 1. / (6. * 20 * 42 * 72 * 110 * 156 * 210);
-
   double x2 = x * x;
-
   return x *
          (1 - x2 * (if3 -
                     x2 * (if5 -
@@ -176,19 +195,29 @@ inline double shortsin(double x) {
                                                   x2 * (if13 - x2 * if15)))))));
 }
 
+/*=================================================================
+ * Estart    Calculates the initial guess for the eccentric anomaly
+ *           based on the mean anomaly and the eccentricity of the orbit.
+ *           Code taken from https://github.com/t-brandt/orvara.
+ *
+ * Estart(M, e)
+ *   M       1x1     Mean anomaly (rad)
+ *   e       1x1     Eccentricity of the orbit
+ *
+ *   Returns the initial estimate of the eccentric anomaly (rad).
+ *=================================================================*/
 inline double Estart(double M, double e) {
-  // Taken from https://github.com/t-brandt/orvara
 
-  double ome = 1. - e;
-  double sqrt_ome = sqrt(ome);
-
-  double chi = M / (sqrt_ome * ome);
-  double Lam = sqrt(8 + 9 * chi * chi);
-  double S = cbrt(Lam + 3 * chi);
-  double sigma = 6 * chi / (2 + S * S + 4. / (S * S));
-  double s2 = sigma * sigma;
-  double denom = s2 + 2;
-  double E =
+  const double ome = 1. - e;
+  const double sqrt_ome = sqrt(ome);
+  const double chi = M / (sqrt_ome * ome);
+  const double Lam = sqrt(8 + 9 * chi * chi);
+  const double S = cbrt(Lam + 3 * chi);
+  const double S_squared = S * S;
+  const double sigma = 6 * chi / (2 + S_squared + 4. / (S_squared));
+  const double s2 = sigma * sigma;
+  const double denom = s2 + 2;
+  const double E =
       sigma *
       (1 + s2 * ome *
                ((s2 + 20) / (60. * denom) +
@@ -214,20 +243,14 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
   double E_tab[6 * 13];
   double bounds[13];
   getbounds(bounds, E_tab, e);
-  double pi = 3.14159265358979323846264338327950288;
-  double pi_d_4 = 0.25 * pi;
-  double pi_d_2 = 0.5 * pi;
-  double threepi_d_4 = 0.75 * pi;
-  double twopi = 2. * pi;
   int j, k;
   double dx;
 
-  double one_over_ecc = 1.0 / fmax(1e-17, e);
+  const double one_over_ecc = 1.0 / fmax(1e-17, e);
   double _M, _E, _sinE, _cosE, dE, dEsq_d6;
   int Esign;
   double num, denom;
 
-  double one_sixth = 1. / 6;
   if (e < 0.78) {
     for (int i; i < n; ++i) {
       _M = M[i];
@@ -235,7 +258,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
       // Cut mean anomaly between 0 and pi to use shorter Taylor series
       if (_M > pi) {
         Esign = -1;
-        _M = twopi - _M;
+        _M = two_pi - _M;
       } else {
         Esign = 1;
       }
@@ -275,7 +298,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
       dE = num * denom / (denom * denom + 0.5 * _sinE * num);
 
       // Apply correction to E, sinE, and _cosE with second order approximation
-      E[i] = fmod(Esign * (_E + dE) + twopi, twopi);
+      E[i] = fmod(Esign * (_E + dE) + two_pi, two_pi);
       sinE[i] = Esign * (_sinE * (1 - 0.5 * dE * dE) + dE * _cosE);
       cosE[i] = _cosE * (1 - 0.5 * dE * dE) - dE * _sinE;
     }
@@ -287,7 +310,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
       // Cut mean anomaly between 0 and pi to use shorter Taylor series
       if (_M > pi) {
         Esign = -1;
-        _M = twopi - _M;
+        _M = two_pi - _M;
       } else {
         Esign = 1;
       }
@@ -335,7 +358,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
       }
       dEsq_d6 = dE * dE * one_sixth;
 
-      E[i] = fmod(Esign * (_E + dE) + twopi, twopi);
+      E[i] = fmod(Esign * (_E + dE) + two_pi, two_pi);
       sinE[i] =
           Esign * (_sinE * (1 - 3 * dEsq_d6) + dE * (1 - dEsq_d6) * _cosE);
       cosE[i] = _cosE * (1 - 3 * dEsq_d6) - dE * (1 - dEsq_d6) * _sinE;

@@ -139,9 +139,8 @@ def eccanom_orvara(
     Args:
         M (float or ndarray):
             mean anomaly (rad)
-        e (float or ndarray):
-            eccentricity (eccentricity may be a scalar if M is given as
-            an array, but otherwise must match the size of M.)
+        e (float):
+            eccentricity
 
     Returns:
         tuple:
@@ -814,7 +813,6 @@ def invKepler(
     # ellipses
     einds = (e > 0) & (e < 1)
     if any(einds):
-
         Me = np.mod(M[einds], 2 * np.pi)
         ee = e[einds]
 
@@ -1482,9 +1480,4 @@ def calc_RV_from_time(
 
     rv = np.zeros(len(t))
     keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
-    # for nplanet in range(len(e)):
-    #     # Get the object's rv added to the array
-    #     rv = keplertools.CyRV.CyRV_from_time(
-    #         rv, t, tp[nplanet], per[nplanet], e[nplanet], w[nplanet], K[nplanet]
-    #     )
     return rv

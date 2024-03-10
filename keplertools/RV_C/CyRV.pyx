@@ -22,7 +22,9 @@ def CyRV_from_E(np.ndarray[DTYPE_t, ndim=1] rv,
         DTYPE_t e,
         DTYPE_t w,
         DTYPE_t K):
-    """Finds radial velocity for a single object at the desired epochs
+    """Finds radial velocity for a single object at the desired epochs, uses
+    method from orvara that relies on eccentric anomaly and sine and cosine of
+    the eccentric anomaly.
 
     Args:
         rv (ndarray):
@@ -145,67 +147,8 @@ def CyRV_from_time(np.ndarray[DTYPE_t, ndim=1] rv,
 
     cdef int n = t.size
     cdef int m = tp.size
+    # Call the C function
     RV_from_time(<double*> rv.data, <double*> t.data, <double*> tp.data,
-            <double*> per.data, <double*> e.data, <double*> w.data, <double*>
-            K.data, n, m)
-    # cdef np.ndarray[DTYPE_t, ndim=1] M =  np.zeros(n, dtype=DTYPE)
-    # meananom(<double*> M.data, <double*> t.data, tp, per, twopi, n)
-
-    # # Calculating E, sinE, and cosE from M
-    # cdef np.ndarray[DTYPE_t, ndim=1] sinE =  np.zeros(n, dtype=DTYPE)
-    # cdef np.ndarray[DTYPE_t, ndim=1] cosE =  np.zeros(n, dtype=DTYPE)
-
-    # eccanom_orvara(<double*> E.data,<double*> sinE.data, <double*> cosE.data, <double*> M.data, e, n)
-
-    # cdef double pi_d_2 = pi/2.
-
-    # cdef double sqrt1pe = sqrt(1 + e)
-    # cdef double sqrt1me = sqrt(1 - e)
-
-    # cdef double cosarg = cos(w)
-    # cdef double sinarg = sin(w)
-    # cdef double ecccosarg = e*cosarg
-    # cdef double sqrt1pe_div_sqrt1me = sqrt1pe/sqrt1me
-    # cdef double TA, ratio, fac, tanEAd2
-
-    # cdef int i
-
-    # ##################################################################
-    # # Trickery with trig identities.  The code below is mathematically
-    # # identical to the use of the true anomaly.  If sin(EA) is small
-    # # and cos(EA) is close to -1, no problem as long as sin(EA) is not
-    # # precisely zero (set tan(EA/2)=1e100 in this case).  If sin(EA)
-    # # is small and EA is close to zero, use the fifth-order Taylor
-    # # expansion for tangent.  This is good to ~1e-15 for EA within
-    # # ~0.015 of 0.  Assume eccentricity is not precisely unity (this
-    # # should be forbidden by the priors).  Very, very high
-    # # eccentricities (significantly above 0.9999) may be problematic.
-    # # This routine assumes range reduction of the eccentric anomaly to
-    # # (-pi, pi] and will throw an error if this is violated.
-    # ##################################################################
-
-    # cdef double one_d_24 = 1./24
-    # cdef double one_d_240 = 1./240
-
-    # for i, _ in enumerate(rv):
-    #     _E = E[i]
-    #     # Convert to correct range
-    #     if _E > pi:
-    #         _E = twopi - _E
-
-    #     if fabs(sinE[i]) > 1.5e-2:
-    #         tanEAd2 = (1 - cosE[i])/sinE[i]
-    #     elif _E < -pi or _E > pi:
-    #         raise ValueError("EA input to calc_RV must be betwen -pi and pi.")
-    #     elif fabs(_E) < pi_d_2:
-    #         tanEAd2 = _E*(0.5 + _E**2*(one_d_24 + one_d_240*_E**2))
-    #     elif sinE[i] != 0:
-    #         tanEAd2 = (1 - cosE[i])/sinE[i]
-    #     else:
-    #         tanEAd2 = 1e100
-
-    #     ratio = sqrt1pe_div_sqrt1me*tanEAd2
-    #     fac = 2/(1 + ratio**2)
-    #     rv[i] += K*(cosarg*(fac - 1) - sinarg*ratio*fac + ecccosarg)
-
+                 <double*> per.data, <double*> e.data, <double*> w.data,
+                 <double*> K.data, n, m)
     return rv
