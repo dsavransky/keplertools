@@ -1,42 +1,38 @@
 import os.path
 import re
 
+import numpy
 import setuptools
+from Cython.Build import cythonize
 
-try:
-    import numpy
-    from Cython.Build import cythonize
-
-    extensions = [
-        setuptools.Extension(
-            "keplertools.CyKeplerSTM",
-            [
-                os.path.join("keplertools", "KeplerSTM_C", "CyKeplerSTM.pyx"),
-                os.path.join("keplertools", "KeplerSTM_C", "KeplerSTM_C.c"),
-            ],
-            include_dirs=[numpy.get_include()],
-        ),
-        setuptools.Extension(
-            "keplertools.Cyeccanom",
-            [
-                os.path.join("keplertools", "eccanom_C", "Cyeccanom.pyx"),
-                os.path.join("keplertools", "eccanom_C", "eccanom_C.c"),
-            ],
-            include_dirs=[numpy.get_include()],
-        ),
-        setuptools.Extension(
-            "keplertools.CyRV",
-            [
-                os.path.join("keplertools", "RV_C", "CyRV.pyx"),
-                os.path.join("keplertools", "RV_C", "RV_C.c"),
-                os.path.join("keplertools", "eccanom_C", "eccanom_C.c"),
-            ],
-            include_dirs=[numpy.get_include()],
-        ),
-    ]
-    extensions = cythonize(extensions)
-except ImportError:
-    extensions = []
+extensions = [
+    setuptools.Extension(
+        "keplertools.CyKeplerSTM",
+        [
+            os.path.join("keplertools", "KeplerSTM_C", "CyKeplerSTM.pyx"),
+            os.path.join("keplertools", "KeplerSTM_C", "KeplerSTM_C.c"),
+        ],
+        include_dirs=[numpy.get_include()],
+    ),
+    setuptools.Extension(
+        "keplertools.Cyeccanom",
+        [
+            os.path.join("keplertools", "eccanom_C", "Cyeccanom.pyx"),
+            os.path.join("keplertools", "eccanom_C", "eccanom_C.c"),
+        ],
+        include_dirs=[numpy.get_include()],
+    ),
+    setuptools.Extension(
+        "keplertools.CyRV",
+        [
+            os.path.join("keplertools", "RV_C", "CyRV.pyx"),
+            os.path.join("keplertools", "RV_C", "RV_C.c"),
+            os.path.join("keplertools", "eccanom_C", "eccanom_C.c"),
+        ],
+        include_dirs=[numpy.get_include()],
+    ),
+]
+extensions = cythonize(extensions)
 
 
 with open("README.md", "r") as fh:
@@ -63,7 +59,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/dsavransky/keplertools",
     packages=setuptools.find_packages(exclude=["tests*"]),
-    install_requires=["numpy"],
+    install_requires=["numpy", "cython"],
     extras_require={"C": ["cython"]},
     classifiers=[
         "Programming Language :: Python :: 3.7",
