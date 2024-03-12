@@ -158,6 +158,7 @@ def eccanom_orvara(
     """
 
     # force M into [0, 2*pi)
+    M = np.array(M, ndmin=1).astype(float).flatten()
     M = np.mod(M, 2 * np.pi)
 
     E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
