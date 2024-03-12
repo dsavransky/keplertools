@@ -60,7 +60,6 @@ setuptools.setup(
     url="https://github.com/dsavransky/keplertools",
     packages=setuptools.find_packages(exclude=["tests*"]),
     install_requires=["numpy", "cython"],
-    extras_require={"C": ["cython"]},
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
