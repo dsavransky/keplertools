@@ -1,7 +1,8 @@
+import warnings
+from typing import Optional, Tuple, Union
+
 import numpy as np
 import numpy.typing as npt
-from typing import Union, Tuple, Optional
-import warnings
 
 floatORarray = Union[float, npt.NDArray[np.float_]]
 
@@ -12,6 +13,8 @@ try:
 except ImportError:
     haveCyeccanom = False
     pass
+
+import keplertools.CyRV
 
 
 def eccanom(
@@ -117,6 +120,50 @@ def eccanom(
         return E, numIter
     else:
         return E  # type: ignore
+
+
+def eccanom_orvara(
+    M: npt.ArrayLike,
+    e: float,
+) -> Union[
+    Tuple[npt.NDArray[np.float_], int],
+    Tuple[npt.NDArray[np.float_], int],
+    Tuple[npt.NDArray[np.float_], int],
+]:
+    """Finds eccentric anomaly E, sinE, cosE from mean anomaly and eccentricity
+
+    This uses the method described the orvara paper which uses a 5th order
+    polynomial to approximate E and does a single Newton-Raphson iteration to
+    refine it.
+
+    Args:
+        M (float or ndarray):
+            mean anomaly (rad)
+        e (float):
+            eccentricity
+
+    Returns:
+        tuple:
+            E (float or ndarray):
+                eccentric anomaly (rad)
+            sinE (float or ndarray):
+                Sine of eccentric anomaly (rad)
+            cosE (float or ndarray):
+                Cosine of eccentric anomaly (rad)
+
+    Notes:
+        Currently only works for a single orbit since it relies on creating a
+        lookup table for a single orbit.
+
+    """
+
+    # force M into [0, 2*pi)
+    M = np.array(M, ndmin=1).astype(float).flatten()
+    M = np.mod(M, 2 * np.pi)
+
+    E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
+
+    return E, sinE, cosE
 
 
 def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
@@ -767,7 +814,6 @@ def invKepler(
     # ellipses
     einds = (e > 0) & (e < 1)
     if any(einds):
-
         Me = np.mod(M[einds], 2 * np.pi)
         ee = e[einds]
 
@@ -1366,3 +1412,73 @@ def universalfg(
         out += (counter,)
 
     return out
+
+
+def calc_RV_from_M(
+    M: npt.ArrayLike,
+    e: npt.ArrayLike,
+    w: npt.ArrayLike,
+    K: npt.ArrayLike,
+):
+    """Calculate the combined radial velocity of a system of n objects at the
+    m epochs.
+
+    Args:
+        M (numpy.ndarray):
+            Mean anomalies of the objects at desired epochs (n x m) (rad)
+        e (numpy.ndarray):
+            Eccentricities of the objects (n x 1)
+        w (numpy.ndarray):
+            Argument of periapsis of the objects (n x 1) (rad)
+        K (numpy.ndarray):
+            Semi-amplitudes of the objects (n x 1) (m/s)
+
+    Returns:
+        rv (numpy.ndarray):
+            System radial velocities at desired epochs
+
+    """
+
+    rv = np.zeros(M.shape[1])
+    for nplanet in range(M.shape[0]):
+        E, sinE, cosE = eccanom_orvara(M[nplanet, :], e[nplanet])
+
+        # Get the object's rv added to the array
+        rv = keplertools.CyRV.CyRV_from_E(
+            rv, E, sinE, cosE, e[nplanet], w[nplanet], K[nplanet]
+        )
+    return rv
+
+
+def calc_RV_from_time(
+    t: npt.ArrayLike,
+    tp: npt.ArrayLike,
+    per: npt.ArrayLike,
+    e: npt.ArrayLike,
+    w: npt.ArrayLike,
+    K: npt.ArrayLike,
+):
+    """Calculate the combined radial velocity of a system of n objects at the
+    m epochs.
+
+    Args:
+        t (numpy.ndarray):
+            Epochs in jd (m x 1)
+        tp (numpy.ndarray):
+            Time of periastrons of the objects (n x 1)
+        e (numpy.ndarray):
+            Eccentricities of the objects (n x 1)
+        w (numpy.ndarray):
+            Argument of periapsis of the objects (n x 1) (rad)
+        K (numpy.ndarray):
+            Semi-amplitudes of the objects (n x 1) (m/s)
+
+    Returns:
+        rv (numpy.ndarray):
+            System radial velocities at desired epochs
+
+    """
+
+    rv = np.zeros(len(t))
+    keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+    return rv
