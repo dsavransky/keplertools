@@ -8,13 +8,12 @@ floatORarray = Union[float, npt.NDArray[np.float_]]
 
 try:
     import keplertools.Cyeccanom  # type: ignore
+    import keplertools.CyRV
 
     haveCyeccanom = True
 except ImportError:
     haveCyeccanom = False
     pass
-
-import keplertools.CyRV
 
 
 def eccanom(
@@ -290,16 +289,16 @@ def vec2orbElem2(
     v2s = np.sum(vs**2.0, axis=0)  # orbital velocity squared
     rmag = np.sqrt(np.sum(rs**2.0, axis=0))  # orbital radius
 
-    hvec = np.vstack(
-        (
-            rs[1] * vs[2] - rs[2] * vs[1],
-            rs[2] * vs[0] - rs[0] * vs[2],
-            rs[0] * vs[1] - rs[1] * vs[0],
-        )
-    )  # angular momentum vector
-    nvec = np.vstack(
-        (-hvec[1], hvec[0], np.zeros(len(hvec[2])))
-    )  # node-pointing vector
+    hvec = np.vstack((
+        rs[1] * vs[2] - rs[2] * vs[1],
+        rs[2] * vs[0] - rs[0] * vs[2],
+        rs[0] * vs[1] - rs[1] * vs[0],
+    ))  # angular momentum vector
+    nvec = np.vstack((
+        -hvec[1],
+        hvec[0],
+        np.zeros(len(hvec[2])),
+    ))  # node-pointing vector
     evec = (
         np.tile((v2s - mus / rmag) / mus, (3, 1)) * rs
         - np.tile(np.sum(rs * vs, axis=0) / mus, (3, 1)) * vs
@@ -419,13 +418,11 @@ def vec2orbElem(
     a = -mus / 2.0 / Ws
     # semi-major axis
 
-    L = np.vstack(
-        (
-            rs[1] * vs[2] - rs[2] * vs[1],
-            rs[2] * vs[0] - rs[0] * vs[2],
-            rs[0] * vs[1] - rs[1] * vs[0],
-        )
-    )  # angular momentum vector
+    L = np.vstack((
+        rs[1] * vs[2] - rs[2] * vs[1],
+        rs[2] * vs[0] - rs[0] * vs[2],
+        rs[0] * vs[1] - rs[1] * vs[0],
+    ))  # angular momentum vector
     L2s = np.sum(L**2.0, axis=0)  # angular momentum squared
     Ls = np.sqrt(L2s)  # angular momentum
     p = L2s / mus  # semi-parameter
@@ -499,25 +496,21 @@ def calcAB(
 
     assert a.size == e.size == O.size == I.size == w.size
 
-    A = np.vstack(
-        (
-            a * (np.cos(O) * np.cos(w) - np.sin(O) * np.cos(I) * np.sin(w)),
-            a * (np.sin(O) * np.cos(w) + np.cos(O) * np.cos(I) * np.sin(w)),
-            a * np.sin(I) * np.sin(w),
-        )
-    )
+    A = np.vstack((
+        a * (np.cos(O) * np.cos(w) - np.sin(O) * np.cos(I) * np.sin(w)),
+        a * (np.sin(O) * np.cos(w) + np.cos(O) * np.cos(I) * np.sin(w)),
+        a * np.sin(I) * np.sin(w),
+    ))
 
-    B = np.vstack(
-        (
-            -a
-            * np.sqrt(1 - e**2)
-            * (np.cos(O) * np.sin(w) + np.sin(O) * np.cos(I) * np.cos(w)),
-            a
-            * np.sqrt(1 - e**2)
-            * (-np.sin(O) * np.sin(w) + np.cos(O) * np.cos(I) * np.cos(w)),
-            a * np.sqrt(1 - e**2) * np.sin(I) * np.cos(w),
-        )
-    )
+    B = np.vstack((
+        -a
+        * np.sqrt(1 - e**2)
+        * (np.cos(O) * np.sin(w) + np.sin(O) * np.cos(I) * np.cos(w)),
+        a
+        * np.sqrt(1 - e**2)
+        * (-np.sin(O) * np.sin(w) + np.cos(O) * np.cos(I) * np.cos(w)),
+        a * np.sqrt(1 - e**2) * np.sin(I) * np.cos(w),
+    ))
 
     return A, B
 
@@ -628,7 +621,8 @@ def orbElem2vec(
             np.matmul(-A, np.array(np.sin(E), ndmin=2))
             + np.matmul(B, np.array(np.cos(E), ndmin=2))
         ) * np.tile(
-            np.sqrt(mus * a ** (-3.0)) / (1 - e * np.cos(E)), (3, 1)  # type:ignore
+            np.sqrt(mus * a ** (-3.0)) / (1 - e * np.cos(E)),
+            (3, 1),  # type:ignore
         )
     else:
         r = np.matmul(A, np.diag(np.cos(E) - e)) + np.matmul(B, np.diag(np.sin(E)))
@@ -997,35 +991,31 @@ def kepler2orbstate(
     # orbital radius
     r = ell / (1 + e * np.cos(nu))
 
-    r = np.vstack(
-        [
-            r * (-np.sin(O) * np.sin(nu + w) * np.cos(I) + np.cos(O) * np.cos(nu + w)),
-            r * (np.sin(O) * np.cos(nu + w) + np.sin(nu + w) * np.cos(I) * np.cos(O)),
-            r * np.sin(I) * np.sin(nu + w),
-        ]
-    ).transpose()
+    r = np.vstack([
+        r * (-np.sin(O) * np.sin(nu + w) * np.cos(I) + np.cos(O) * np.cos(nu + w)),
+        r * (np.sin(O) * np.cos(nu + w) + np.sin(nu + w) * np.cos(I) * np.cos(O)),
+        r * np.sin(I) * np.sin(nu + w),
+    ]).transpose()
 
-    v = np.vstack(
-        [
-            -mu
-            * (
-                e * np.sin(O) * np.cos(I) * np.cos(w)
-                + e * np.sin(w) * np.cos(O)
-                + np.sin(O) * np.cos(I) * np.cos(nu + w)
-                + np.sin(nu + w) * np.cos(O)
-            )
-            / h,
-            mu
-            * (
-                -e * np.sin(O) * np.sin(w)
-                + e * np.cos(I) * np.cos(O) * np.cos(w)
-                - np.sin(O) * np.sin(nu + w)
-                + np.cos(I) * np.cos(O) * np.cos(nu + w)
-            )
-            / h,
-            mu * (e * np.cos(w) + np.cos(nu + w)) * np.sin(I) / h,
-        ]
-    ).transpose()
+    v = np.vstack([
+        -mu
+        * (
+            e * np.sin(O) * np.cos(I) * np.cos(w)
+            + e * np.sin(w) * np.cos(O)
+            + np.sin(O) * np.cos(I) * np.cos(nu + w)
+            + np.sin(nu + w) * np.cos(O)
+        )
+        / h,
+        mu
+        * (
+            -e * np.sin(O) * np.sin(w)
+            + e * np.cos(I) * np.cos(O) * np.cos(w)
+            - np.sin(O) * np.sin(nu + w)
+            + np.cos(I) * np.cos(O) * np.cos(nu + w)
+        )
+        / h,
+        mu * (e * np.cos(w) + np.cos(nu + w)) * np.sin(I) / h,
+    ]).transpose()
 
     return r, v
 
@@ -1224,7 +1214,7 @@ def c2c3(psi: npt.ArrayLike) -> Tuple[npt.NDArray[np.float_], npt.NDArray[np.flo
 
     c2[negpsi] = (1 - np.cosh(np.sqrt(-psi[negpsi]))) / psi[negpsi]
     c3[negpsi] = (np.sinh(np.sqrt(-psi[negpsi])) - np.sqrt(-psi[negpsi])) / np.sqrt(
-        -psi[negpsi] ** 3
+        -(psi[negpsi] ** 3)
     )
 
     return c2, c3
