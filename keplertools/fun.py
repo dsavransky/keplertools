@@ -1,22 +1,12 @@
 import warnings
 from typing import Optional, Tuple, Union
-
 import numpy as np
 import numpy.typing as npt
+import keplertools.Cyeccanom  # type: ignore
+import keplertools.CyRV  # type: ignore
 
 np.float_ = np.float64  # for numpy 2 compatibility
 floatORarray = Union[float, npt.NDArray[np.float_]]
-
-try:
-    import keplertools.Cyeccanom  # type: ignore
-
-    haveCyeccanom = True
-except ImportError:
-    haveCyeccanom = False
-    pass
-
-import keplertools.CyRV
-
 
 def eccanom(
     M: npt.ArrayLike,
@@ -42,7 +32,7 @@ def eccanom(
         epsmult (float):
             Precision of convergence (multiplied by precision of floating data type).
             Optional, defaults to 4.01.
-        maxiter (int):
+        maxIter (int):
             Maximum numbr of iterations.  Optional, defaults to 100.
         returnIter (bool):
             Return number of iterations (defaults false, only available in python
@@ -69,11 +59,6 @@ def eccanom(
         element by element.
 
     """
-
-    if not (noc):
-        noc = not (haveCyeccanom)
-        if verb and not (haveCyeccanom):
-            print("C version requested, but not found")
 
     # make sure M and e are of the correct format.
     # if either is scalar, expand to match sizes
@@ -467,7 +452,7 @@ def calcAB(
     I: npt.NDArray[np.float_],
     w: npt.NDArray[np.float_],
 ) -> Tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
-    """Calculate inertial frame components of perifocal frame unit vectors scaled
+    r"""Calculate inertial frame components of perifocal frame unit vectors scaled
     by orbit semi-major and semi-minor axes.
 
     Note that these quantities are closely related to the Thiele-Innes constants
@@ -753,13 +738,13 @@ def invKepler(
         e (float or ndarray):
             eccentricity (eccentricity may be a scalar if M is given as
             an array, but otherwise must match the size of M.)
-        tolerance (float):
+        tol (float):
             Convergence of tolerance. Defaults to eps(2*pi)
         E0 (float or ndarray):
             Initial guess for iteration.  Defaults to Taylor-expansion based value for
             closed orbits and Vallado-derived heuristic for open orbits. If set, must
             match size of M.
-        maxiter (int):
+        maxIter (int):
             Maximum numbr of iterations.  Optional, defaults to 100.
         return_nu (bool):
             Return true anomaly (defaults false)
@@ -1255,12 +1240,13 @@ def universalfg(
         dt (float or numpy.ndarray):
             Propagation time.  If float, assuming all states are propagated for the same
             time
+        maxIter (int):
+            Maximum numbr of iterations.  Optional, defaults to 100.
         return_counter (bool):
             If True, returns the number of iterations for each input state. Defaults
             False.
         convergence_error (bool):
             Raise error on convergence failure if True. Defaults True.
-
 
     Returns:
         tuple:
@@ -1435,7 +1421,7 @@ def calc_RV_from_M(
             Semi-amplitudes of the objects (n x 1) (m/s)
 
     Returns:
-        rv (numpy.ndarray):
+        numpy.ndarray:
             System radial velocities at desired epochs
 
     """
@@ -1458,7 +1444,7 @@ def calc_RV_from_time(
     e: npt.ArrayLike,
     w: npt.ArrayLike,
     K: npt.ArrayLike,
-):
+)->npt.ArrayLike:
     """Calculate the combined radial velocity of a system of n objects at the
     m epochs.
 
@@ -1467,6 +1453,8 @@ def calc_RV_from_time(
             Epochs in jd (m x 1)
         tp (numpy.ndarray):
             Time of periastrons of the objects (n x 1)
+        per (numpy.ndarray):
+            Period
         e (numpy.ndarray):
             Eccentricities of the objects (n x 1)
         w (numpy.ndarray):
@@ -1475,7 +1463,7 @@ def calc_RV_from_time(
             Semi-amplitudes of the objects (n x 1) (m/s)
 
     Returns:
-        rv (numpy.ndarray):
+        numpy.ndarray:
             System radial velocities at desired epochs
 
     """

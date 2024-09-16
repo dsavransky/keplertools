@@ -1,56 +1,49 @@
-from __future__ import print_function
-
 import numpy as np
-import sys
-
-try:
-    import keplertools.CyKeplerSTM
-except ImportError:
-    pass
-
-"""
-Kepler State Transition Matrix
-
-Class container for defining a planetary system (or group of planets in multiple
-systems) via their gravitational parameters and state vectors.  Contains methods
-for propagating state vectors forward in time via the Kepler state transition
-matrix.
-
-Constructor takes the following arguments:
-    x0 (ndarray):
-        6n vector of stacked positions and velocities for n planets
-    mu (ndarray):
-        n vector of standard gravitational parameters mu = G(m+m_s) where m is
-        the planet mass, m_s is the star mass and G is the gravitational
-        constant
-    epsmult (float):
-        default multiplier on floating point precision, used as convergence
-        metric.  Higher values mean faster convergence, but sacrifice precision.
-    prefVallado (bool):
-        If True, always try the Vallado algorithm first, otherwise try Shepherd first.
-        Defaults False;
-    noc (bool):
-        Do not attempt to use cythonized code even if found.  Defaults False.
-
-
-Step function (updateState) takes the following arguments:
-    dt (float):
-        time step
-
-All units must be complementary (i.e., if position is AU and velocity
-is AU/day, mu must be in AU^3/day^2.
-
-Two algorithms are implemented, both using Batting/Goodyear universal variables.
-The first is from Shepperd (1984), using continued fraction to solve the Kepler equation.
-The second is from Vallado (2004), using Newton iteration to solve the time equation.
-One algorithm is used preferentially, and the other is called only in the case of convergence
-failure on the first.  All convergence is calculated to machine precision of the data type and
-variable size, scaled by a user-selected multiple.
-
-"""
-
+import keplertools.CyKeplerSTM
 
 class planSys:
+    """
+    Kepler State Transition Matrix
+
+    Class container for defining a planetary system (or group of planets in multiple
+    systems) via their gravitational parameters and state vectors.  Contains methods
+    for propagating state vectors forward in time via the Kepler state transition
+    matrix.
+
+    Args:
+        x0 (numpy.ndarray):
+            6n vector of stacked positions and velocities for n planets
+        mu (numpy.ndarray):
+            n vector of standard gravitational parameters mu = G(m+m_s) where m is
+            the planet mass, m_s is the star mass and G is the gravitational
+            constant
+        epsmult (float):
+            default multiplier on floating point precision, used as convergence
+            metric.  Higher values mean faster convergence, but sacrifice precision.
+        prefVallado (bool):
+            If True, always try the Vallado algorithm first, otherwise try Shepherd
+            first. Defaults False.
+        noc (bool):
+            Do not attempt to use cythonized code.  Defaults False.
+
+
+    .. note::
+
+        All units must be complementary (i.e., if position is AU and velocity
+        is AU/day, mu must be in AU^3/day^2.
+
+    .. note::
+
+        Two algorithms are implemented, both using Batting/Goodyear universal variables.
+        The first is from Shepperd (1984), using continued fraction to solve the Kepler
+        equation. The second is from Vallado (2004), using Newton iteration to solve the
+        time equation. One algorithm is used preferentially, and the other is called
+        only in the case of convergence failure on the first.  All convergence is
+        calculated to machine precision of the data type and variable size, scaled by a
+        user-selected multiple.
+
+    """
+
     def __init__(self, x0, mu, epsmult=4.0, prefVallado=False, noc=False):
         # determine number of planets and validate input
         nplanets = x0.size / 6.0
@@ -77,14 +70,22 @@ class planSys:
         self.rinds = tmp[0:3]
         self.vinds = tmp[3:6]
 
-        if not (noc) and ("keplertools.CyKeplerSTM" in sys.modules):
-            self.havec = True
-        else:
+        if noc:
             self.havec = False
+        else:
+            self.havec = True
 
         self.updateState(np.squeeze(x0))
 
     def updateState(self, x0):
+        """Update internal state variable and associated constants
+
+        Args:
+            x0 (~numpy.ndarray(float)):
+                6n vector of stacked positions and velocities for n planets
+
+        """
+
         self.x0 = x0
         r0 = self.x0[self.rinds]
         v0 = self.x0[self.vinds]
@@ -98,6 +99,14 @@ class planSys:
         self.nu0osmu = self.nu0 / np.sqrt(self.mu)
 
     def takeStep(self, dt):
+        """Propagate state by input time
+
+        Args:
+            dt (float):
+                Time step
+
+        """
+
         if self.havec:
             try:
                 tmp = keplertools.CyKeplerSTM.CyKeplerSTM(
@@ -105,7 +114,7 @@ class planSys:
                 )
                 self.updateState(tmp)
                 return
-            except:
+            except:  # noqa: E722
                 print("Cython propagation failed.  Falling back to python.")
 
         try:
@@ -117,6 +126,18 @@ class planSys:
         self.updateState(np.dot(Phi, self.x0))
 
     def calcSTM(self, dt):
+        """Compute STM for input time
+
+        Args:
+            dt (float):
+                Time step
+
+        Returns:
+            ~numpy.ndarray(float):
+                6x6 STM
+
+        """
+
         # allocate
         u = np.zeros(self.nplanets)
         deltaU = np.zeros(self.beta.size)
@@ -173,6 +194,24 @@ class planSys:
         return Phi
 
     def contFrac(self, x, a=5.0, b=0.0, c=5.0 / 2.0):
+        """Compute continued fraction
+
+        Args:
+            x (~numpy.ndarray(float)):
+                iterant
+            a (float):
+                a parameter
+            b (float):
+                b parameter
+            c (float):
+                c parameter
+
+        Returns:
+            ~numpy.ndarray(float):
+                converged iterant
+
+        """
+
         # initialize
         k = 1 - 2 * (a - b)
         l = 2 * (c - 1)
@@ -206,6 +245,18 @@ class planSys:
         return G
 
     def calcSTM_vallado(self, dt):
+        """Compute STM for input time
+
+        Args:
+            dt (float):
+                Time step
+
+        Returns:
+            ~numpy.ndarray(float):
+                6x6 STM
+
+        """
+
         # classify orbits
         epsval = 1e-12
 
@@ -306,6 +357,19 @@ class planSys:
         return Phi
 
     def psi2c2c3(self, psi0):
+        """Compute c_2 and c_3 values given psi
+
+        Args:
+            psi0 (float):
+                Input psi value
+
+        Returns:
+            tuple:
+                c2 (float):
+                    c2 value
+                c3 (float):
+                    c3 value
+        """
 
         c2 = np.zeros(len(psi0))
         c3 = np.zeros(len(psi0))
