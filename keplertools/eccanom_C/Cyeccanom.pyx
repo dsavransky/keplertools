@@ -2,7 +2,7 @@ import numpy as np
 cimport numpy as np
 DTYPE = np.double
 ctypedef np.double_t DTYPE_t
-ctypedef np.int_t ITYPE_t
+ctypedef np.int64_t ITYPE_t
 
 cdef extern from "eccanom_C.h":
     int eccanom_C(double* E, double* M, double* e, double epsmult, int maxIter, int n)
