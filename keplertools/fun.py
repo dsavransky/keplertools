@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Union
 import numpy as np
 import numpy.typing as npt
 
+np.float_ = np.float64  # for numpy 2 compatibility
 floatORarray = Union[float, npt.NDArray[np.float_]]
 
 try:
