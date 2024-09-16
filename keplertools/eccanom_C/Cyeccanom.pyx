@@ -62,22 +62,24 @@ def Cyeccanom_orvara(np.ndarray[DTYPE_t, ndim=1] M, DTYPE_t e):
     refine it.
 
     Args:
-        M (ndarray):
+        M (numpy.ndarray):
             mean anomaly (rad)
         e (float):
             eccentricity
 
     Returns:
-        E (ndarray):
+        E (numpy.ndarray):
             eccentric anomaly (rad)
-        sinE (ndarray):
+        sinE (numpy.ndarray):
             Sine of eccentric anomaly
-        cosE (ndarray):
+        cosE (numpy.ndarray):
             Cosine of eccentric anomaly
 
-    Notes:
+    ..note::
+
         Currently only works for a single orbit since it relies on creating a
         lookup table for a single orbit. A loop can be added.
+
     """
 
     cdef int n = M.size
