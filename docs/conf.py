@@ -72,4 +72,3 @@ html_static_path = ['_static']
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None)}
 
-exclude_patterns = ["**KeplerSTM_C/*", "**eccanom_C/*"]
