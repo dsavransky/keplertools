@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define pi  3.14159265358979323846264338327950288
+
 static const double one_sixth = 1. / 6;
 static const double if3 = 1. / 6;
 static const double if5 = 1. / (6. * 20);
@@ -10,7 +12,6 @@ static const double if9 = 1. / (6. * 20 * 42 * 72);
 static const double if11 = 1. / (6. * 20 * 42 * 72 * 110);
 static const double if13 = 1. / (6. * 20 * 42 * 72 * 110 * 156);
 static const double if15 = 1. / (6. * 20 * 42 * 72 * 110 * 156 * 210);
-static const double pi = 3.14159265358979323846264338327950288;
 static const double two_pi = 2. * pi;
 static const double pi_d_12 = pi / 12;
 static const double pi_d_6 = pi / 6;
