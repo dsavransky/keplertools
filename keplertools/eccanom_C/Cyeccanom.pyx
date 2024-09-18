@@ -68,12 +68,13 @@ def Cyeccanom_orvara(np.ndarray[DTYPE_t, ndim=1] M, DTYPE_t e):
             eccentricity
 
     Returns:
-        E (numpy.ndarray):
-            eccentric anomaly (rad)
-        sinE (numpy.ndarray):
-            Sine of eccentric anomaly
-        cosE (numpy.ndarray):
-            Cosine of eccentric anomaly
+        tuple:
+            E (numpy.ndarray):
+                eccentric anomaly (rad)
+            sinE (numpy.ndarray):
+                Sine of eccentric anomaly
+            cosE (numpy.ndarray):
+                Cosine of eccentric anomaly
 
     .. note::
 
