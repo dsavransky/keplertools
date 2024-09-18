@@ -5,7 +5,6 @@ Two-body orbital propagation tools
 [![Coverage Status](https://coveralls.io/repos/github/dsavransky/keplertools/badge.svg?branch=main)](https://coveralls.io/github/dsavransky/keplertools?branch=main)
 [![Documentation Status](https://readthedocs.org/projects/keplertools/badge/?version=latest)](https://keplertools.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/keplertools.svg)](https://badge.fury.io/py/keplertools)
-[![Requirements Status](https://requires.io/github/dsavransky/keplertools/requirements.svg?branch=main)](https://requires.io/github/dsavransky/keplertools/requirements/?branch=main)
 
 ## Installation
 
@@ -13,13 +12,13 @@ Two-body orbital propagation tools
 pip install keplertools
 ```
 
-To also compile the Cython versions (compiler required, see here for details: https://cython.readthedocs.io/en/latest/src/quickstart/install.html):
+To install from source, clone or download the repository, and, in the top level directory run:
 
 ```
-pip install --no-binary keplertools keplertools[C]
+pip install .
 ```
 
-If using a zsh shell (or depending on your specific shell setup), you may need to escape the square brackets (i.e., the last bit of the previous command would be ``keplertools\[C\]``.
+Installing from source requires a C compiler.  See here for details: https://cython.readthedocs.io/en/latest/src/quickstart/install.html
 
 ## Documentation
 
