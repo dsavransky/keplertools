@@ -1,6 +1,7 @@
 name: Upload to PyPI
 
 on:
+  workflow_dispath:
   release:
     types: [created]
 
