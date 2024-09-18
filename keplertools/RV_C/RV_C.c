@@ -1,7 +1,7 @@
 #include "../eccanom_C/eccanom_C.h"
 #include <math.h>
 
-const double pi = 3.14159265358979323846264338327950288;
+#define pi = 3.14159265358979323846264338327950288
 const double twopi = 2 * pi;
 const double pi_d_2 = pi / 2.;
 const double one_d_24 = 1. / 24;
@@ -52,6 +52,9 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
 
   double _tp, _per, _e, _w, _K;
 
+    //int *s = malloc(sizes);
+    // ....
+    //free s;
   double M[n], E[n], sinE[n], cosE[n];
   double sqrt1pe, sqrt1me, cosarg, sinarg, ecccosarg, sqrt1pe_div_sqrt1me;
   double TA, ratio, fac, tanEAd2;
