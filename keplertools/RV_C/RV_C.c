@@ -1,7 +1,8 @@
 #include "../eccanom_C/eccanom_C.h"
 #include <math.h>
 
-#define pi = 3.14159265358979323846264338327950288
+#define pi 3.14159265358979323846264338327950288
+
 const double twopi = 2 * pi;
 const double pi_d_2 = pi / 2.;
 const double one_d_24 = 1. / 24;
