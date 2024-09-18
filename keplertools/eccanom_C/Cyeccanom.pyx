@@ -75,7 +75,7 @@ def Cyeccanom_orvara(np.ndarray[DTYPE_t, ndim=1] M, DTYPE_t e):
         cosE (numpy.ndarray):
             Cosine of eccentric anomaly
 
-    ..note::
+    .. note::
 
         Currently only works for a single orbit since it relies on creating a
         lookup table for a single orbit. A loop can be added.
