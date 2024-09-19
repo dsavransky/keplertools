@@ -23,3 +23,7 @@ Installing from source requires a C compiler.  See here for details: https://cyt
 ## Documentation
 
 https://keplertools.readthedocs.io/
+
+## Acknowledgements
+
+Portions of this code are adapted from orvara (https://github.com/t-brandt/orvara).

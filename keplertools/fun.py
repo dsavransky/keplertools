@@ -8,6 +8,7 @@ import keplertools.CyRV  # type: ignore
 np.float_ = np.float64  # for numpy 2 compatibility
 floatORarray = Union[float, npt.NDArray[np.float_]]
 
+
 def eccanom(
     M: npt.ArrayLike,
     e: npt.ArrayLike,
@@ -1258,7 +1259,8 @@ def universalfg(
                 Number of required iterations (size n).  Only returned if return_counter
                 is True
 
-    Notes:
+    .. note::
+
         r.flatten() and v.flatten() will automatically stack elements in the proper
         order in a 1D array
 
@@ -1407,8 +1409,7 @@ def calc_RV_from_M(
     w: npt.ArrayLike,
     K: npt.ArrayLike,
 ):
-    """Calculate the combined radial velocity of a system of n objects at the
-    m epochs.
+    """Calculate the combined radial velocity of a system of n objects at m epochs.
 
     Args:
         M (numpy.ndarray):
@@ -1444,9 +1445,8 @@ def calc_RV_from_time(
     e: npt.ArrayLike,
     w: npt.ArrayLike,
     K: npt.ArrayLike,
-)->npt.ArrayLike:
-    """Calculate the combined radial velocity of a system of n objects at the
-    m epochs.
+) -> npt.ArrayLike:
+    """Calculate the combined radial velocity of a system of n objects at m epochs.
 
     Args:
         t (numpy.ndarray):
@@ -1467,6 +1467,13 @@ def calc_RV_from_time(
             System radial velocities at desired epochs
 
     """
+
+    t = forcendarray(t)
+    tp = forcendarray(tp)
+    per = forcendarray(per)
+    e = forcendarray(e)
+    w = forcendarray(w)
+    K = forcendarray(K)
 
     rv = np.zeros(len(t))
     keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)

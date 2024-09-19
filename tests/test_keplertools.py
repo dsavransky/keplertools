@@ -393,3 +393,6 @@ class TestKeplerTools(unittest.TestCase):
                 < np.sqrt(np.spacing(r1mag[counter < 100]))
             )
         )
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,6 +1,8 @@
 #include "../eccanom_C/eccanom_C.h"
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #define pi 3.14159265358979323846264338327950288
 
@@ -55,11 +57,16 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
   double _tp, _per, _e, _w, _K;
 
   //double M[n], E[n], sinE[n], cosE[n];
+  int arrSize = n * sizeof (double);
   double *M, *E, *sinE, *cosE;
-  M = (double*) malloc(n);
-  E = (double*) malloc(n);
-  sinE = (double*) malloc(n);
-  cosE = (double*) malloc(n);
+  M = (double*) malloc(arrSize);
+  memset( M, 0, arrSize );
+  E = (double*) malloc(arrSize);
+  memset( E, 0, arrSize );
+  sinE = (double*) malloc(arrSize);
+  memset( sinE, 0, arrSize );
+  cosE = (double*) malloc(arrSize);
+  memset( cosE, 0, arrSize );
 
   double sqrt1pe, sqrt1me, cosarg, sinarg, ecccosarg, sqrt1pe_div_sqrt1me;
   double TA, ratio, fac, tanEAd2;
