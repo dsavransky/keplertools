@@ -1,16 +1,6 @@
 keplertools package
 ===================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   keplertools.KeplerSTM_C
-   keplertools.RV_C
-   keplertools.eccanom_C
-
 Submodules
 ----------
 
