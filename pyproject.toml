@@ -81,8 +81,8 @@ docstring-code-line-length = "dynamic"
 
 
 [tool.cibuildwheel]
-# Only build on CPython 3.10
-build = "cp310-*"
+# Only build on CPython 3.10-3.12
+build = "cp3{10,11,12}-*"
 # Skip 32-bit builds, pypy, and musllinux
 skip = ["*-win32", "*-manylinux_i686", "*-musllinux_i686", "pypy*", "pp*", "*-musllinux_aarch64", "*-musllinux_x86_64"]
 # other options
