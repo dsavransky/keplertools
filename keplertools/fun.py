@@ -1,19 +1,12 @@
 import warnings
 from typing import Optional, Tuple, Union
-
 import numpy as np
 import numpy.typing as npt
+import keplertools.Cyeccanom  # type: ignore
+import keplertools.CyRV  # type: ignore
 
+np.float_ = np.float64  # for numpy 2 compatibility
 floatORarray = Union[float, npt.NDArray[np.float_]]
-
-try:
-    import keplertools.Cyeccanom  # type: ignore
-    import keplertools.CyRV
-
-    haveCyeccanom = True
-except ImportError:
-    haveCyeccanom = False
-    pass
 
 
 def eccanom(
@@ -40,7 +33,7 @@ def eccanom(
         epsmult (float):
             Precision of convergence (multiplied by precision of floating data type).
             Optional, defaults to 4.01.
-        maxiter (int):
+        maxIter (int):
             Maximum numbr of iterations.  Optional, defaults to 100.
         returnIter (bool):
             Return number of iterations (defaults false, only available in python
@@ -67,11 +60,6 @@ def eccanom(
         element by element.
 
     """
-
-    if not (noc):
-        noc = not (haveCyeccanom)
-        if verb and not (haveCyeccanom):
-            print("C version requested, but not found")
 
     # make sure M and e are of the correct format.
     # if either is scalar, expand to match sizes
@@ -289,16 +277,16 @@ def vec2orbElem2(
     v2s = np.sum(vs**2.0, axis=0)  # orbital velocity squared
     rmag = np.sqrt(np.sum(rs**2.0, axis=0))  # orbital radius
 
-    hvec = np.vstack((
-        rs[1] * vs[2] - rs[2] * vs[1],
-        rs[2] * vs[0] - rs[0] * vs[2],
-        rs[0] * vs[1] - rs[1] * vs[0],
-    ))  # angular momentum vector
-    nvec = np.vstack((
-        -hvec[1],
-        hvec[0],
-        np.zeros(len(hvec[2])),
-    ))  # node-pointing vector
+    hvec = np.vstack(
+        (
+            rs[1] * vs[2] - rs[2] * vs[1],
+            rs[2] * vs[0] - rs[0] * vs[2],
+            rs[0] * vs[1] - rs[1] * vs[0],
+        )
+    )  # angular momentum vector
+    nvec = np.vstack(
+        (-hvec[1], hvec[0], np.zeros(len(hvec[2])))
+    )  # node-pointing vector
     evec = (
         np.tile((v2s - mus / rmag) / mus, (3, 1)) * rs
         - np.tile(np.sum(rs * vs, axis=0) / mus, (3, 1)) * vs
@@ -418,11 +406,13 @@ def vec2orbElem(
     a = -mus / 2.0 / Ws
     # semi-major axis
 
-    L = np.vstack((
-        rs[1] * vs[2] - rs[2] * vs[1],
-        rs[2] * vs[0] - rs[0] * vs[2],
-        rs[0] * vs[1] - rs[1] * vs[0],
-    ))  # angular momentum vector
+    L = np.vstack(
+        (
+            rs[1] * vs[2] - rs[2] * vs[1],
+            rs[2] * vs[0] - rs[0] * vs[2],
+            rs[0] * vs[1] - rs[1] * vs[0],
+        )
+    )  # angular momentum vector
     L2s = np.sum(L**2.0, axis=0)  # angular momentum squared
     Ls = np.sqrt(L2s)  # angular momentum
     p = L2s / mus  # semi-parameter
@@ -463,7 +453,7 @@ def calcAB(
     I: npt.NDArray[np.float_],
     w: npt.NDArray[np.float_],
 ) -> Tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
-    """Calculate inertial frame components of perifocal frame unit vectors scaled
+    r"""Calculate inertial frame components of perifocal frame unit vectors scaled
     by orbit semi-major and semi-minor axes.
 
     Note that these quantities are closely related to the Thiele-Innes constants
@@ -496,21 +486,25 @@ def calcAB(
 
     assert a.size == e.size == O.size == I.size == w.size
 
-    A = np.vstack((
-        a * (np.cos(O) * np.cos(w) - np.sin(O) * np.cos(I) * np.sin(w)),
-        a * (np.sin(O) * np.cos(w) + np.cos(O) * np.cos(I) * np.sin(w)),
-        a * np.sin(I) * np.sin(w),
-    ))
+    A = np.vstack(
+        (
+            a * (np.cos(O) * np.cos(w) - np.sin(O) * np.cos(I) * np.sin(w)),
+            a * (np.sin(O) * np.cos(w) + np.cos(O) * np.cos(I) * np.sin(w)),
+            a * np.sin(I) * np.sin(w),
+        )
+    )
 
-    B = np.vstack((
-        -a
-        * np.sqrt(1 - e**2)
-        * (np.cos(O) * np.sin(w) + np.sin(O) * np.cos(I) * np.cos(w)),
-        a
-        * np.sqrt(1 - e**2)
-        * (-np.sin(O) * np.sin(w) + np.cos(O) * np.cos(I) * np.cos(w)),
-        a * np.sqrt(1 - e**2) * np.sin(I) * np.cos(w),
-    ))
+    B = np.vstack(
+        (
+            -a
+            * np.sqrt(1 - e**2)
+            * (np.cos(O) * np.sin(w) + np.sin(O) * np.cos(I) * np.cos(w)),
+            a
+            * np.sqrt(1 - e**2)
+            * (-np.sin(O) * np.sin(w) + np.cos(O) * np.cos(I) * np.cos(w)),
+            a * np.sqrt(1 - e**2) * np.sin(I) * np.cos(w),
+        )
+    )
 
     return A, B
 
@@ -746,13 +740,13 @@ def invKepler(
         e (float or ndarray):
             eccentricity (eccentricity may be a scalar if M is given as
             an array, but otherwise must match the size of M.)
-        tolerance (float):
+        tol (float):
             Convergence of tolerance. Defaults to eps(2*pi)
         E0 (float or ndarray):
             Initial guess for iteration.  Defaults to Taylor-expansion based value for
             closed orbits and Vallado-derived heuristic for open orbits. If set, must
             match size of M.
-        maxiter (int):
+        maxIter (int):
             Maximum numbr of iterations.  Optional, defaults to 100.
         return_nu (bool):
             Return true anomaly (defaults false)
@@ -991,31 +985,35 @@ def kepler2orbstate(
     # orbital radius
     r = ell / (1 + e * np.cos(nu))
 
-    r = np.vstack([
-        r * (-np.sin(O) * np.sin(nu + w) * np.cos(I) + np.cos(O) * np.cos(nu + w)),
-        r * (np.sin(O) * np.cos(nu + w) + np.sin(nu + w) * np.cos(I) * np.cos(O)),
-        r * np.sin(I) * np.sin(nu + w),
-    ]).transpose()
+    r = np.vstack(
+        [
+            r * (-np.sin(O) * np.sin(nu + w) * np.cos(I) + np.cos(O) * np.cos(nu + w)),
+            r * (np.sin(O) * np.cos(nu + w) + np.sin(nu + w) * np.cos(I) * np.cos(O)),
+            r * np.sin(I) * np.sin(nu + w),
+        ]
+    ).transpose()
 
-    v = np.vstack([
-        -mu
-        * (
-            e * np.sin(O) * np.cos(I) * np.cos(w)
-            + e * np.sin(w) * np.cos(O)
-            + np.sin(O) * np.cos(I) * np.cos(nu + w)
-            + np.sin(nu + w) * np.cos(O)
-        )
-        / h,
-        mu
-        * (
-            -e * np.sin(O) * np.sin(w)
-            + e * np.cos(I) * np.cos(O) * np.cos(w)
-            - np.sin(O) * np.sin(nu + w)
-            + np.cos(I) * np.cos(O) * np.cos(nu + w)
-        )
-        / h,
-        mu * (e * np.cos(w) + np.cos(nu + w)) * np.sin(I) / h,
-    ]).transpose()
+    v = np.vstack(
+        [
+            -mu
+            * (
+                e * np.sin(O) * np.cos(I) * np.cos(w)
+                + e * np.sin(w) * np.cos(O)
+                + np.sin(O) * np.cos(I) * np.cos(nu + w)
+                + np.sin(nu + w) * np.cos(O)
+            )
+            / h,
+            mu
+            * (
+                -e * np.sin(O) * np.sin(w)
+                + e * np.cos(I) * np.cos(O) * np.cos(w)
+                - np.sin(O) * np.sin(nu + w)
+                + np.cos(I) * np.cos(O) * np.cos(nu + w)
+            )
+            / h,
+            mu * (e * np.cos(w) + np.cos(nu + w)) * np.sin(I) / h,
+        ]
+    ).transpose()
 
     return r, v
 
@@ -1244,12 +1242,13 @@ def universalfg(
         dt (float or numpy.ndarray):
             Propagation time.  If float, assuming all states are propagated for the same
             time
+        maxIter (int):
+            Maximum numbr of iterations.  Optional, defaults to 100.
         return_counter (bool):
             If True, returns the number of iterations for each input state. Defaults
             False.
         convergence_error (bool):
             Raise error on convergence failure if True. Defaults True.
-
 
     Returns:
         tuple:
@@ -1261,7 +1260,8 @@ def universalfg(
                 Number of required iterations (size n).  Only returned if return_counter
                 is True
 
-    Notes:
+    .. note::
+
         r.flatten() and v.flatten() will automatically stack elements in the proper
         order in a 1D array
 
@@ -1410,8 +1410,7 @@ def calc_RV_from_M(
     w: npt.ArrayLike,
     K: npt.ArrayLike,
 ):
-    """Calculate the combined radial velocity of a system of n objects at the
-    m epochs.
+    """Calculate the combined radial velocity of a system of n objects at m epochs.
 
     Args:
         M (numpy.ndarray):
@@ -1424,7 +1423,7 @@ def calc_RV_from_M(
             Semi-amplitudes of the objects (n x 1) (m/s)
 
     Returns:
-        rv (numpy.ndarray):
+        numpy.ndarray:
             System radial velocities at desired epochs
 
     """
@@ -1440,6 +1439,54 @@ def calc_RV_from_M(
     return rv
 
 
+def RV_from_time_py(
+    t: npt.ArrayLike,
+    tp: npt.ArrayLike,
+    per: npt.ArrayLike,
+    e: npt.ArrayLike,
+    w: npt.ArrayLike,
+    K: npt.ArrayLike,
+) -> npt.ArrayLike:
+    """
+    Calculate radial velocities using the standard method.
+
+    Args:
+        t (numpy.ndarray):
+            Epoch times in jd (n,).
+        tp (numpy.ndarray):
+            Times of periastron passages for each object (m,).
+        per (numpy.ndarray):
+            Orbital periods for each object (m,).
+        e (numpy.ndarray):
+            Eccentricities for each object (m,).
+        w (numpy.ndarray):
+            Arguments of periapsis for each object (m,) in radians.
+        K (numpy.ndarray):
+            Semi-amplitudes for each object (m,) in m/s.
+
+    Returns:
+        rv (numpy.ndarray):
+            Array of radial velocities at each epoch (n,).
+    """
+    # Initialize the radial velocity array
+    rv = np.zeros_like(t)
+    # Iterate over each planet in the system
+    for j in range(tp.size):
+        _tp, _per, _e, _w, _K = tp[j], per[j], e[j], w[j], K[j]
+
+        # Calculate mean anomaly
+        phase = (t - tp[j]) / per[j]
+        M = 2.0 * np.pi * (phase - np.floor(phase))
+
+        # Calculate eccentric anomaly and true anomaly
+        E = eccanom(M, e[j])
+        nu = trueanom(E, e[j])
+
+        # Update radial velocities
+        rv += K[j] * (e[j] * np.cos(w[j]) + np.cos(w[j] + nu))
+    return rv
+
+
 def calc_RV_from_time(
     t: npt.ArrayLike,
     tp: npt.ArrayLike,
@@ -1447,28 +1494,43 @@ def calc_RV_from_time(
     e: npt.ArrayLike,
     w: npt.ArrayLike,
     K: npt.ArrayLike,
-):
-    """Calculate the combined radial velocity of a system of n objects at the
-    m epochs.
+    use_c: bool = True,
+) -> npt.ArrayLike:
+    """Calculate the combined radial velocity of a system of n objects at m epochs.
 
     Args:
         t (numpy.ndarray):
             Epochs in jd (m x 1)
         tp (numpy.ndarray):
             Time of periastrons of the objects (n x 1)
+        per (numpy.ndarray):
+            Period
         e (numpy.ndarray):
             Eccentricities of the objects (n x 1)
         w (numpy.ndarray):
             Argument of periapsis of the objects (n x 1) (rad)
         K (numpy.ndarray):
             Semi-amplitudes of the objects (n x 1) (m/s)
+        use_c (bool):
+            Use the Cython implementation if True, otherwise use the pure
+            Python implementation.
 
     Returns:
-        rv (numpy.ndarray):
+        numpy.ndarray:
             System radial velocities at desired epochs
 
     """
 
-    rv = np.zeros(len(t))
-    keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+    t = forcendarray(t)
+    tp = forcendarray(tp)
+    per = forcendarray(per)
+    e = forcendarray(e)
+    w = forcendarray(w)
+    K = forcendarray(K)
+
+    if use_c:
+        rv = np.zeros(len(t))
+        keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+    else:
+        rv = RV_from_time_py(t, tp, per, e, w, K)
     return rv
