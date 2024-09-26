@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define pi  3.14159265358979323846264338327950288
+
 static const double one_sixth = 1. / 6;
 static const double if3 = 1. / 6;
 static const double if5 = 1. / (6. * 20);
@@ -10,7 +12,6 @@ static const double if9 = 1. / (6. * 20 * 42 * 72);
 static const double if11 = 1. / (6. * 20 * 42 * 72 * 110);
 static const double if13 = 1. / (6. * 20 * 42 * 72 * 110 * 156);
 static const double if15 = 1. / (6. * 20 * 42 * 72 * 110 * 156 * 210);
-static const double pi = 3.14159265358979323846264338327950288;
 static const double two_pi = 2. * pi;
 static const double pi_d_12 = pi / 12;
 static const double pi_d_6 = pi / 6;
@@ -39,7 +40,7 @@ static const double elevenpi_d_12 = pi * 11. / 12;
 
 int eccanom_C(double E[], double M[], double e[], double epsmult, int maxIter,
               int n) {
-
+  
   int j;
   double tmp;
 
@@ -243,7 +244,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
   double E_tab[6 * 13];
   double bounds[13];
   getbounds(bounds, E_tab, e);
-  int j, k;
+  int i, j, k;
   double dx;
 
   const double one_over_ecc = 1.0 / fmax(1e-17, e);
@@ -252,7 +253,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
   double num, denom;
 
   if (e < 0.78) {
-    for (int i; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
       _M = M[i];
 
       // Cut mean anomaly between 0 and pi to use shorter Taylor series
@@ -305,7 +306,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
   }
   // For higher eccentricities we need to go to third order
   else {
-    for (int i; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
       _M = M[i];
       // Cut mean anomaly between 0 and pi to use shorter Taylor series
       if (_M > pi) {

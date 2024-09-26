@@ -16,7 +16,7 @@ def CyKeplerSTM(np.ndarray[DTYPE_t, ndim=1] x0, DTYPE_t dt, np.ndarray[DTYPE_t, 
 
     Cythonized version of the Kepler State Transition Matrix Calculations.
     This provides a single method to iteratively call the backend KeplerSTM_C function
-    on inputs.  
+    on inputs.
 
     Args:
         x0 (ndarray):
@@ -24,17 +24,17 @@ def CyKeplerSTM(np.ndarray[DTYPE_t, ndim=1] x0, DTYPE_t dt, np.ndarray[DTYPE_t, 
         dt (float):
             Time step
         mus (ndarray):
-            n x 1 vector of standard gravitational parameters mu = G(m+m_s) where m is 
-            the planet mass, m_s is the star mass and G is the gravitational 
+            n x 1 vector of standard gravitational parameters mu = G(m+m_s) where m is
+            the planet mass, m_s is the star mass and G is the gravitational
             constant
         epsmult (float):
-            default multiplier on floating point precision, used as convergence 
+            default multiplier on floating point precision, used as convergence
             metric.  Higher values mean faster convergence, but sacrifice precision.
-            
+
     Return:
         x1 (ndarray):
             Propagated orbital values (equivalent dimension to x0)
-    
+
     Notes:
         All units must be complementary (i.e., if position is AU and velocity
         is AU/day, mu must be in AU^3/day^2).
@@ -42,7 +42,7 @@ def CyKeplerSTM(np.ndarray[DTYPE_t, ndim=1] x0, DTYPE_t dt, np.ndarray[DTYPE_t, 
     '''
     cdef int N = mus.size
 
-    assert (x0.dtype == DTYPE) and (x0.size == N*6), "Incompatible inputs." 
+    assert (x0.dtype == DTYPE) and (x0.size == N*6), "Incompatible inputs."
 
 
     #intialize output and intermediate arrays
@@ -61,6 +61,6 @@ def CyKeplerSTM(np.ndarray[DTYPE_t, ndim=1] x0, DTYPE_t dt, np.ndarray[DTYPE_t, 
                 raise Exception("Integration failed.")
         x1[j:j+6] = xout
         mucounter += 1
- 
+
     return x1
 

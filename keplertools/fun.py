@@ -285,7 +285,11 @@ def vec2orbElem2(
         )
     )  # angular momentum vector
     nvec = np.vstack(
-        (-hvec[1], hvec[0], np.zeros(len(hvec[2])))
+        (
+            -hvec[1],
+            hvec[0],
+            np.zeros(len(hvec[2])),
+        )
     )  # node-pointing vector
     evec = (
         np.tile((v2s - mus / rmag) / mus, (3, 1)) * rs

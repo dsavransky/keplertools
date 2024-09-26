@@ -2,7 +2,7 @@ import numpy as np
 cimport numpy as np
 DTYPE = np.double
 ctypedef np.double_t DTYPE_t
-ctypedef np.int_t ITYPE_t
+ctypedef np.int64_t ITYPE_t
 
 cdef extern from "eccanom_C.h":
     int eccanom_C(double* E, double* M, double* e, double epsmult, int maxIter, int n)
@@ -62,22 +62,25 @@ def Cyeccanom_orvara(np.ndarray[DTYPE_t, ndim=1] M, DTYPE_t e):
     refine it.
 
     Args:
-        M (ndarray):
+        M (numpy.ndarray):
             mean anomaly (rad)
         e (float):
             eccentricity
 
     Returns:
-        E (ndarray):
-            eccentric anomaly (rad)
-        sinE (ndarray):
-            Sine of eccentric anomaly
-        cosE (ndarray):
-            Cosine of eccentric anomaly
+        tuple:
+            E (numpy.ndarray):
+                eccentric anomaly (rad)
+            sinE (numpy.ndarray):
+                Sine of eccentric anomaly
+            cosE (numpy.ndarray):
+                Cosine of eccentric anomaly
 
-    Notes:
+    .. note::
+
         Currently only works for a single orbit since it relies on creating a
         lookup table for a single orbit. A loop can be added.
+
     """
 
     cdef int n = M.size

@@ -1,7 +1,11 @@
 #include "../eccanom_C/eccanom_C.h"
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
-const double pi = 3.14159265358979323846264338327950288;
+#define pi 3.14159265358979323846264338327950288
+
 const double twopi = 2 * pi;
 const double pi_d_2 = pi / 2.;
 const double one_d_24 = 1. / 24;
@@ -52,7 +56,18 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
 
   double _tp, _per, _e, _w, _K;
 
-  double M[n], E[n], sinE[n], cosE[n];
+  //double M[n], E[n], sinE[n], cosE[n];
+  int arrSize = n * sizeof (double);
+  double *M, *E, *sinE, *cosE;
+  M = (double*) malloc(arrSize);
+  memset( M, 0, arrSize );
+  E = (double*) malloc(arrSize);
+  memset( E, 0, arrSize );
+  sinE = (double*) malloc(arrSize);
+  memset( sinE, 0, arrSize );
+  cosE = (double*) malloc(arrSize);
+  memset( cosE, 0, arrSize );
+
   double sqrt1pe, sqrt1me, cosarg, sinarg, ecccosarg, sqrt1pe_div_sqrt1me;
   double TA, ratio, fac, tanEAd2;
 
@@ -111,5 +126,12 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
       rv[i] += _K * (cosarg * (fac - 1) - sinarg * ratio * fac + ecccosarg);
     }
   }
+
+  //cleanup
+  free(M);
+  free(E);
+  free(sinE);
+  free(cosE);
+  
   return;
 }

@@ -12,6 +12,14 @@ keplertools.CyKeplerSTM module
    :undoc-members:
    :show-inheritance:
 
+keplertools.CyRV module
+-----------------------
+
+.. automodule:: keplertools.CyRV
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 keplertools.Cyeccanom module
 ----------------------------
 

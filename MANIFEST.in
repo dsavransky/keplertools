@@ -3,5 +3,7 @@ include keplertools/KeplerSTM_C/CyKeplerSTM.pyx keplertools/KeplerSTM_C/KeplerST
 exclude keplertools/KeplerSTM_C/CyKeplerSTM.c
 include keplertools/eccanom_C/Cyeccanom.pyx keplertools/eccanom_C/eccanom_C.*
 exclude keplertools/eccanom_C/Cyeccanom.c
+include keplertools/RV_C/CyRV.pyx keplertools/RV_C/RV_C.* 
+exclude keplertools/RV_C/CyRV.c
 recursive-exclude tests *
 exclude requirements.txt .gitignore .travis.yml .coveragerc
