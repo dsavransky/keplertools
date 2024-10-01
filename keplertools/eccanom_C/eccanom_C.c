@@ -306,7 +306,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
   }
   // For higher eccentricities we need to go to third order
   else {
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n; i++) {
       _M = M[i];
       // Cut mean anomaly between 0 and pi to use shorter Taylor series
       if (_M > pi) {
@@ -316,8 +316,8 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
         Esign = 1;
       }
       if ((2 * _M + (1 - e)) > 0.2) {
-        for (j = 11;; --j) {
-          if (_M > bounds[j]) {
+        for (j = 11;; j--) {
+          if (_M >= bounds[j - 1]) {
             break;
           }
         }
