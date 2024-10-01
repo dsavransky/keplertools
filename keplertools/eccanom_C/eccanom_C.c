@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define pi  3.14159265358979323846264338327950288
+#define pi 3.14159265358979323846264338327950288
 
 static const double one_sixth = 1. / 6;
 static const double if3 = 1. / 6;
@@ -40,7 +40,7 @@ static const double elevenpi_d_12 = pi * 11. / 12;
 
 int eccanom_C(double E[], double M[], double e[], double epsmult, int maxIter,
               int n) {
-  
+
   int j;
   double tmp;
 
@@ -123,46 +123,46 @@ void getbounds(double bounds[], double E_tab[], double e) {
 
   double x;
 
-  E_tab[1] = 1 / (1. - e);
-  E_tab[2] = 0;
+  E_tab[1] = 1. / (1. - e);
+  E_tab[2] = 0.;
 
-  x = 1. / (1 - g2c_e);
+  x = 1. / (1. - g2c_e);
   E_tab[7] = x;
   E_tab[8] = -0.5 * g2s_e * x * x * x;
-  x = 1. / (1 - g3c_e);
+  x = 1. / (1. - g3c_e);
   E_tab[13] = x;
   E_tab[14] = -0.5 * g3s_e * x * x * x;
-  x = 1. / (1 - g4c_e);
+  x = 1. / (1. - g4c_e);
   E_tab[19] = x;
   E_tab[20] = -0.5 * g4s_e * x * x * x;
-  x = 1. / (1 - g5c_e);
+  x = 1. / (1. - g5c_e);
   E_tab[25] = x;
   E_tab[26] = -0.5 * g5s_e * x * x * x;
-  x = 1. / (1 - g6c_e);
+  x = 1. / (1. - g6c_e);
   E_tab[31] = x;
   E_tab[32] = -0.5 * g6s_e * x * x * x;
 
-  E_tab[37] = 1;
+  E_tab[37] = 1.;
   E_tab[38] = -0.5 * e;
 
-  x = 1. / (1 + g6c_e);
+  x = 1. / (1. + g6c_e);
   E_tab[43] = x;
   E_tab[44] = -0.5 * g6s_e * x * x * x;
-  x = 1. / (1 + g5c_e);
+  x = 1. / (1. + g5c_e);
   E_tab[49] = x;
   E_tab[50] = -0.5 * g5s_e * x * x * x;
-  x = 1. / (1 + g4c_e);
+  x = 1. / (1. + g4c_e);
   E_tab[55] = x;
   E_tab[56] = -0.5 * g4s_e * x * x * x;
-  x = 1. / (1 + g3c_e);
+  x = 1. / (1. + g3c_e);
   E_tab[61] = x;
   E_tab[62] = -0.5 * g3s_e * x * x * x;
-  x = 1. / (1 + g2c_e);
+  x = 1. / (1. + g2c_e);
   E_tab[67] = x;
   E_tab[68] = -0.5 * g2s_e * x * x * x;
 
-  E_tab[73] = 1. / (1 + e);
-  E_tab[74] = 0;
+  E_tab[73] = 1. / (1. + e);
+  E_tab[74] = 0.;
 
   double B0, B1, B2, idx;
   int i, k;
@@ -177,9 +177,9 @@ void getbounds(double bounds[], double E_tab[], double e) {
     B1 = idx * (-2 * E_tab[k + 2] - idx * (E_tab[k + 1] - E_tab[k + 7]));
     B2 = idx * (E_tab[k + 8] - E_tab[k + 2]);
 
-    E_tab[k + 3] = B2 - 4 * B1 + 10 * B0;
-    E_tab[k + 4] = (-2 * B2 + 7 * B1 - 15 * B0) * idx;
-    E_tab[k + 5] = (B2 - 3 * B1 + 6 * B0) * idx * idx;
+    E_tab[k + 3] = B2 - 4. * B1 + 10. * B0;
+    E_tab[k + 4] = (-2. * B2 + 7. * B1 - 15. * B0) * idx;
+    E_tab[k + 5] = (B2 - 3. * B1 + 6. * B0) * idx * idx;
   }
 
   return;
@@ -188,8 +188,8 @@ void getbounds(double bounds[], double E_tab[], double e) {
 inline double shortsin(double x) {
   // Taken from https://github.com/t-brandt/orvara
   double x2 = x * x;
-  return x *
-         (1 - x2 * (if3 -
+  return x * (1. -
+              x2 * (if3 -
                     x2 * (if5 -
                           x2 * (if7 -
                                 x2 * (if9 - x2 * (if11 -
@@ -253,7 +253,7 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
   double num, denom;
 
   if (e < 0.78) {
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n; i++) {
       _M = M[i];
 
       // Cut mean anomaly between 0 and pi to use shorter Taylor series
@@ -265,8 +265,8 @@ void eccanom_orvara(double E[], double sinE[], double cosE[], double M[],
       }
 
       // Find the relevant interval, searching backwards
-      for (j = 11;; --j) {
-        if (_M > bounds[j]) {
+      for (j = 11;; j--) {
+        if (_M >= bounds[j - 1]) {
           break;
         }
       }
