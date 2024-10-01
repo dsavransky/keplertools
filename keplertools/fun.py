@@ -1532,9 +1532,18 @@ def calc_RV_from_time(
     w = forcendarray(w)
     K = forcendarray(K)
 
+    # Make sure all inputs are the same size
+    size_match = tp.size == per.size == e.size == w.size == K.size
+    if not size_match:
+        raise ValueError("Inputs must be the same size")
+
+    # Make sure there is at least one planet
+    if tp.size == 0:
+        raise ValueError("You must give at least one planet.")
+
     if use_c:
-        rv = np.zeros(len(t))
-        keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+        rv = np.zeros(len(t), dtype=np.double)
+        rv = keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
     else:
         rv = RV_from_time_py(t, tp, per, e, w, K)
     return rv
