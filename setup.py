@@ -59,7 +59,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/dsavransky/keplertools",
     packages=setuptools.find_packages(exclude=["tests*"]),
-    install_requires=["numpy"],
+    install_requires=["numpy", "cython"],
     classifiers=[
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
@@ -67,6 +67,5 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
-    extra_requires={"C": ["cython"]},
     ext_modules=extensions,
 )

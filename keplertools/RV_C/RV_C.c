@@ -6,10 +6,10 @@
 
 #define pi 3.14159265358979323846264338327950288
 
-const double twopi = 2.0 * pi;
+const double twopi = 2 * pi;
 const double pi_d_2 = pi / 2.;
-const double one_d_24 = 1.0 / 24.0;
-const double one_d_240 = 1.0 / 240.0;
+const double one_d_24 = 1. / 24;
+const double one_d_240 = 1. / 240;
 
 /*=================================================================
  * meananom_C     Calculate the mean anomaly for a set of times, ensuring
@@ -115,13 +115,13 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
         tanEAd2 = (1 - cosE[i]) / sinE[i];
       } else if (fabs(_E) < pi_d_2) {
         tanEAd2 = _E * (0.5 + _E * _E * (one_d_24 + one_d_240 * _E * _E));
-      } else if (sinE[i] != 0.) {
+      } else if (sinE[i] != 0) {
         tanEAd2 = (1 - cosE[i]) / sinE[i];
       } else {
         tanEAd2 = 1e100;
       }
       ratio = sqrt1pe_div_sqrt1me * tanEAd2;
-      fac = 2. / (1. + ratio * ratio);
+      fac = 2 / (1 + ratio * ratio);
       rv[i] += _K * (cosarg * (fac - 1.) - sinarg * ratio * fac + ecccosarg);
     }
   }
