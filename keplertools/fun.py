@@ -111,7 +111,7 @@ def eccanom(
 
 def eccanom_orvara(
     M: npt.ArrayLike,
-    e: float,
+    e: npt.ArrayLike,
 ) -> Union[
     Tuple[npt.NDArray[np.float_], int],
     Tuple[npt.NDArray[np.float_], int],
@@ -119,15 +119,16 @@ def eccanom_orvara(
 ]:
     """Finds eccentric anomaly E, sinE, cosE from mean anomaly and eccentricity
 
-    This uses the method described the orvara paper which uses a 5th order
+    This uses the method described in the orvara paper which uses a 5th order
     polynomial to approximate E and does a single Newton-Raphson iteration to
     refine it.
 
     Args:
         M (float or ndarray):
             mean anomaly (rad)
-        e (float):
-            eccentricity
+        e (float or ndarray):
+            eccentricity (eccentricity may be a scalar if M is given as
+            an array, but otherwise must match the size of M.)
 
     Returns:
         tuple:
@@ -139,18 +140,43 @@ def eccanom_orvara(
                 Cosine of eccentric anomaly (rad)
 
     Notes:
-        Currently only works for a single orbit since it relies on creating a
-        lookup table for a single orbit.
+        If either M or e is scalar, and the other input is an array, the scalar input
+        will be expanded to the same size array as the other input. If both inputs are
+        arrays then they are matched element by element.
 
     """
 
-    # force M into [0, 2*pi)
-    M = np.array(M, ndmin=1).astype(float).flatten()
+    e_is_scalar = np.isscalar(e)
+    if np.isscalar(M):
+        M = np.array(M, ndmin=1).astype(float).flatten()
+
+    # Force M into [0, 2*pi)
     M = np.mod(M, 2 * np.pi)
 
-    E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
+    # If there is only one unique eccentricity, process all M values at once
+    if e_is_scalar:
+        E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
+    else:
+        print(
+            "NOTE: The orvara method is optimized for one eccentricity and you are providing multiple."
+        )
+        # Broadcasting to ensure M and e are compatible
+        M, e = np.broadcast_arrays(M.ravel(), np.array([e]))
+
+        # Apply the Cyeccanom_orvara function over each pair of M and e using np.vectorize
+        vectorized_orvara = np.vectorize(
+            orvara_vector_helper,
+            otypes=[np.float_, np.float_, np.float_],
+        )
+        E, sinE, cosE = vectorized_orvara(M, e)
 
     return E, sinE, cosE
+
+
+def orvara_vector_helper(M_val, e_val):
+    """Wraps the Cyeccanom_orvara function to handle single M value as array."""
+    E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(np.array([M_val]), e_val)
+    return E[0], sinE[0], cosE[0]
 
 
 def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
@@ -1498,7 +1524,7 @@ def calc_RV_from_time(
     e: npt.ArrayLike,
     w: npt.ArrayLike,
     K: npt.ArrayLike,
-    use_c: bool = True,
+    noc: bool = True,
 ) -> npt.ArrayLike:
     """Calculate the combined radial velocity of a system of n objects at m epochs.
 
@@ -1515,7 +1541,7 @@ def calc_RV_from_time(
             Argument of periapsis of the objects (n x 1) (rad)
         K (numpy.ndarray):
             Semi-amplitudes of the objects (n x 1) (m/s)
-        use_c (bool):
+        noc (bool):
             Use the Cython implementation if True, otherwise use the pure
             Python implementation.
 
@@ -1541,7 +1567,7 @@ def calc_RV_from_time(
     if tp.size == 0:
         raise ValueError("You must give at least one planet.")
 
-    if use_c:
+    if noc:
         rv = np.zeros(len(t), dtype=np.double)
         rv = keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
     else:
