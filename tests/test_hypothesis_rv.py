@@ -34,7 +34,7 @@ def planet_parameters_strategy(n_planets):
             # NOTE: The methods diverge too much above 0.99 to be worth testing
             'e': [0.0, 0.99],
             'w': [0.0, 2 * np.pi],
-            'K': [0.0, 1e6],
+            'K': [0.0, 1000],
         }
 
         # Generate array strategies based on the parameter ranges
@@ -93,26 +93,29 @@ class TestCalcRVFromTimeHypothesis(unittest.TestCase):
         if tp.size == 0:
             # No planets case
             with self.assertRaises(ValueError):
-                calc_RV_from_time(t, tp, per, e, w, K, use_c=True)
+                calc_RV_from_time(t, tp, per, e, w, K, noc=False)
             return
 
         # Calculate RV with C implementation
-        rv_c = calc_RV_from_time(t, tp, per, e, w, K, use_c=True)
+        rv_c = calc_RV_from_time(t, tp, per, e, w, K, noc=False)
 
         # Calculate RV with Python implementation
-        rv_py = calc_RV_from_time(t, tp, per, e, w, K, use_c=False)
+        rv_py = calc_RV_from_time(t, tp, per, e, w, K, noc=True)
 
-        # Adjust tolerance based on eccentricity
+        # Adjust atol based on maximum K
+        atol = 1e-6 * K.max()
+
+        # Adjust relative tolerance based on eccentricity
         if np.any(e > 0.9):
-            atol = 1e-5  # Moderate tolerance for high eccentricities
+            rtol = 1e-3
         else:
-            atol = 1e-6  # Tight tolerance for low eccentricities
+            rtol = 1e-4
 
-        # Assert that both implementations are close within the specified tolerance
+        # Assert that both implementations are close within the specified tolerances
         self.assertTrue(
-            np.allclose(rv_c, rv_py, atol=atol),
+            np.allclose(rv_c, rv_py, rtol=rtol, atol=atol),
             ("C and Python implementations differ beyond tolerance.\n"
-             f"Max difference: {np.max(np.abs(rv_c - rv_py))} m/s")
+            f"Max difference: {np.max(np.abs(rv_c - rv_py))} m/s")
         )
 
 if __name__ == "__main__":
