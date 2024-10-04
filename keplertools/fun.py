@@ -111,7 +111,7 @@ def eccanom(
 
 def eccanom_orvara(
     M: npt.ArrayLike,
-    e: float,
+    e: npt.ArrayLike,
 ) -> Union[
     Tuple[npt.NDArray[np.float_], int],
     Tuple[npt.NDArray[np.float_], int],
@@ -119,15 +119,16 @@ def eccanom_orvara(
 ]:
     """Finds eccentric anomaly E, sinE, cosE from mean anomaly and eccentricity
 
-    This uses the method described the orvara paper which uses a 5th order
+    This uses the method described in the orvara paper which uses a 5th order
     polynomial to approximate E and does a single Newton-Raphson iteration to
     refine it.
 
     Args:
         M (float or ndarray):
             mean anomaly (rad)
-        e (float):
-            eccentricity
+        e (float or ndarray):
+            eccentricity (eccentricity may be a scalar if M is given as
+            an array, but otherwise must match the size of M.)
 
     Returns:
         tuple:
@@ -139,18 +140,43 @@ def eccanom_orvara(
                 Cosine of eccentric anomaly (rad)
 
     Notes:
-        Currently only works for a single orbit since it relies on creating a
-        lookup table for a single orbit.
+        If either M or e is scalar, and the other input is an array, the scalar input
+        will be expanded to the same size array as the other input. If both inputs are
+        arrays then they are matched element by element.
 
     """
 
-    # force M into [0, 2*pi)
-    M = np.array(M, ndmin=1).astype(float).flatten()
+    e_is_scalar = np.isscalar(e)
+    if np.isscalar(M):
+        M = np.array(M, ndmin=1).astype(float).flatten()
+
+    # Force M into [0, 2*pi)
     M = np.mod(M, 2 * np.pi)
 
-    E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
+    # If there is only one unique eccentricity, process all M values at once
+    if e_is_scalar:
+        E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(M, e)
+    else:
+        print(
+            "NOTE: The orvara method is optimized for one eccentricity and you are providing multiple."
+        )
+        # Broadcasting to ensure M and e are compatible
+        M, e = np.broadcast_arrays(M.ravel(), np.array([e]))
+
+        # Apply the Cyeccanom_orvara function over each pair of M and e using np.vectorize
+        vectorized_orvara = np.vectorize(
+            orvara_vector_helper,
+            otypes=[np.float_, np.float_, np.float_],
+        )
+        E, sinE, cosE = vectorized_orvara(M, e)
 
     return E, sinE, cosE
+
+
+def orvara_vector_helper(M_val, e_val):
+    """Wraps the Cyeccanom_orvara function to handle single M value as array."""
+    E, sinE, cosE = keplertools.Cyeccanom.Cyeccanom_orvara(np.array([M_val]), e_val)
+    return E[0], sinE[0], cosE[0]
 
 
 def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
@@ -285,7 +311,11 @@ def vec2orbElem2(
         )
     )  # angular momentum vector
     nvec = np.vstack(
-        (-hvec[1], hvec[0], np.zeros(len(hvec[2])))
+        (
+            -hvec[1],
+            hvec[0],
+            np.zeros(len(hvec[2])),
+        )
     )  # node-pointing vector
     evec = (
         np.tile((v2s - mus / rmag) / mus, (3, 1)) * rs
@@ -615,7 +645,8 @@ def orbElem2vec(
             np.matmul(-A, np.array(np.sin(E), ndmin=2))
             + np.matmul(B, np.array(np.cos(E), ndmin=2))
         ) * np.tile(
-            np.sqrt(mus * a ** (-3.0)) / (1 - e * np.cos(E)), (3, 1)  # type:ignore
+            np.sqrt(mus * a ** (-3.0)) / (1 - e * np.cos(E)),
+            (3, 1),  # type:ignore
         )
     else:
         r = np.matmul(A, np.diag(np.cos(E) - e)) + np.matmul(B, np.diag(np.sin(E)))
@@ -1211,7 +1242,7 @@ def c2c3(psi: npt.ArrayLike) -> Tuple[npt.NDArray[np.float_], npt.NDArray[np.flo
 
     c2[negpsi] = (1 - np.cosh(np.sqrt(-psi[negpsi]))) / psi[negpsi]
     c3[negpsi] = (np.sinh(np.sqrt(-psi[negpsi])) - np.sqrt(-psi[negpsi])) / np.sqrt(
-        -psi[negpsi] ** 3
+        -(psi[negpsi] ** 3)
     )
 
     return c2, c3
@@ -1438,6 +1469,54 @@ def calc_RV_from_M(
     return rv
 
 
+def RV_from_time_py(
+    t: npt.ArrayLike,
+    tp: npt.ArrayLike,
+    per: npt.ArrayLike,
+    e: npt.ArrayLike,
+    w: npt.ArrayLike,
+    K: npt.ArrayLike,
+) -> npt.ArrayLike:
+    """
+    Calculate radial velocities using the standard method.
+
+    Args:
+        t (numpy.ndarray):
+            Epoch times in jd (n,).
+        tp (numpy.ndarray):
+            Times of periastron passages for each object (m,).
+        per (numpy.ndarray):
+            Orbital periods for each object (m,).
+        e (numpy.ndarray):
+            Eccentricities for each object (m,).
+        w (numpy.ndarray):
+            Arguments of periapsis for each object (m,) in radians.
+        K (numpy.ndarray):
+            Semi-amplitudes for each object (m,) in m/s.
+
+    Returns:
+        rv (numpy.ndarray):
+            Array of radial velocities at each epoch (n,).
+    """
+    # Initialize the radial velocity array
+    rv = np.zeros_like(t)
+    # Iterate over each planet in the system
+    for j in range(tp.size):
+        _tp, _per, _e, _w, _K = tp[j], per[j], e[j], w[j], K[j]
+
+        # Calculate mean anomaly
+        phase = (t - tp[j]) / per[j]
+        M = 2.0 * np.pi * (phase - np.floor(phase))
+
+        # Calculate eccentric anomaly and true anomaly
+        E = eccanom(M, e[j])
+        nu = trueanom(E, e[j])
+
+        # Update radial velocities
+        rv += K[j] * (e[j] * np.cos(w[j]) + np.cos(w[j] + nu))
+    return rv
+
+
 def calc_RV_from_time(
     t: npt.ArrayLike,
     tp: npt.ArrayLike,
@@ -1445,6 +1524,7 @@ def calc_RV_from_time(
     e: npt.ArrayLike,
     w: npt.ArrayLike,
     K: npt.ArrayLike,
+    noc: bool = True,
 ) -> npt.ArrayLike:
     """Calculate the combined radial velocity of a system of n objects at m epochs.
 
@@ -1461,6 +1541,9 @@ def calc_RV_from_time(
             Argument of periapsis of the objects (n x 1) (rad)
         K (numpy.ndarray):
             Semi-amplitudes of the objects (n x 1) (m/s)
+        noc (bool):
+            Use the Cython implementation if True, otherwise use the pure
+            Python implementation.
 
     Returns:
         numpy.ndarray:
@@ -1475,6 +1558,18 @@ def calc_RV_from_time(
     w = forcendarray(w)
     K = forcendarray(K)
 
-    rv = np.zeros(len(t))
-    keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+    # Make sure all inputs are the same size
+    size_match = tp.size == per.size == e.size == w.size == K.size
+    if not size_match:
+        raise ValueError("Inputs must be the same size")
+
+    # Make sure there is at least one planet
+    if tp.size == 0:
+        raise ValueError("You must give at least one planet.")
+
+    if noc:
+        rv = np.zeros(len(t), dtype=np.double)
+        rv = keplertools.CyRV.CyRV_from_time(rv, t, tp, per, e, w, K)
+    else:
+        rv = RV_from_time_py(t, tp, per, e, w, K)
     return rv

@@ -1,8 +1,8 @@
 #include "../eccanom_C/eccanom_C.h"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 #define pi 3.14159265358979323846264338327950288
 
@@ -28,7 +28,7 @@ void meananom(double M[], double t[], double tp, double per, int n) {
   const double one_over_per = 1 / per;
 
   double phase;
-  for (int i = n; i--;) {
+  for (int i = 0; i < n; i++) {
     phase = (t[i] - tp) * one_over_per;
     M[i] = twopi * (phase - floor(phase));
   }
@@ -56,17 +56,16 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
 
   double _tp, _per, _e, _w, _K;
 
-  //double M[n], E[n], sinE[n], cosE[n];
-  int arrSize = n * sizeof (double);
+  int arrSize = n * sizeof(double);
   double *M, *E, *sinE, *cosE;
-  M = (double*) malloc(arrSize);
-  memset( M, 0, arrSize );
-  E = (double*) malloc(arrSize);
-  memset( E, 0, arrSize );
-  sinE = (double*) malloc(arrSize);
-  memset( sinE, 0, arrSize );
-  cosE = (double*) malloc(arrSize);
-  memset( cosE, 0, arrSize );
+  M = (double *)malloc(arrSize);
+  memset(M, 0, arrSize);
+  E = (double *)malloc(arrSize);
+  memset(E, 0, arrSize);
+  sinE = (double *)malloc(arrSize);
+  memset(sinE, 0, arrSize);
+  cosE = (double *)malloc(arrSize);
+  memset(cosE, 0, arrSize);
 
   double sqrt1pe, sqrt1me, cosarg, sinarg, ecccosarg, sqrt1pe_div_sqrt1me;
   double TA, ratio, fac, tanEAd2;
@@ -85,8 +84,8 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
     // #Calculating E, sinE, and cosE from M
     eccanom_orvara(E, sinE, cosE, M, _e, n);
 
-    sqrt1pe = sqrt(1 + _e);
-    sqrt1me = sqrt(1 - _e);
+    sqrt1pe = sqrt(1. + _e);
+    sqrt1me = sqrt(1. - _e);
 
     cosarg = cos(_w);
     sinarg = sin(_w);
@@ -112,7 +111,7 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
       if (_E > pi) {
         _E = twopi - _E;
       }
-      if (fabs(sinE[i]) > 1.5e-2) {
+      if (fabs(sinE[i]) > 1.5e-6) {
         tanEAd2 = (1 - cosE[i]) / sinE[i];
       } else if (fabs(_E) < pi_d_2) {
         tanEAd2 = _E * (0.5 + _E * _E * (one_d_24 + one_d_240 * _E * _E));
@@ -123,15 +122,15 @@ void RV_from_time(double rv[], double t[], double tp[], double per[],
       }
       ratio = sqrt1pe_div_sqrt1me * tanEAd2;
       fac = 2 / (1 + ratio * ratio);
-      rv[i] += _K * (cosarg * (fac - 1) - sinarg * ratio * fac + ecccosarg);
+      rv[i] += _K * (cosarg * (fac - 1.) - sinarg * ratio * fac + ecccosarg);
     }
   }
 
-  //cleanup
+  // cleanup
   free(M);
   free(E);
   free(sinE);
   free(cosE);
-  
+
   return;
 }

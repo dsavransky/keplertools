@@ -47,7 +47,7 @@ class TestKeplerTools(unittest.TestCase):
 
         # Test eccanom_orvara against eccanom
         E_orvara, *_ = eccanom_orvara(M, e)
-        self.assertTrue(np.max(np.abs(E - E_orvara)) < np.finfo(float).eps * 100.0)
+        self.assertTrue(np.max(np.abs(E - E_orvara)) < 1e-9, f"max diff: {max(np.abs(E - E_orvara))}")
 
     def test_eccanom_vecM_scalare_noc(self):
         """Test eccentric anomaly calc for a scalar eccentricity value (Python value)
@@ -81,6 +81,10 @@ class TestKeplerTools(unittest.TestCase):
             np.max(np.abs(calcM - np.mod(M, 2 * np.pi))) < np.finfo(float).eps * 10.0
         )
 
+        # Test eccanom_orvara against eccanom
+        E_orvara, *_ = eccanom_orvara(M, e)
+        self.assertTrue(np.max(np.abs(E - E_orvara)) < 1e-8, f"max diff: {max(np.abs(E - E_orvara))}")
+
     def test_eccanom_vecM_vece_noc(self):
         """Test eccentric anomaly calculation for vector of eccentricities (python ver)
 
@@ -111,7 +115,7 @@ class TestKeplerTools(unittest.TestCase):
 
         # Compare orvara and base eccanom versions
         E_orvara, *_ = eccanom_orvara(M, e)
-        self.assertTrue(np.max(np.abs(E - E_orvara)) < np.finfo(float).eps * 100.0)
+        self.assertTrue(np.max(np.abs(E - E_orvara)) < 1e-9)
 
     def test_eccanom_scalarM_scalare_noc(self):
         """Test eccentric anomaly calculation for scalar M, e (python ver)"""

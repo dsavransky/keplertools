@@ -32,7 +32,7 @@ extensions = [
         include_dirs=[numpy.get_include()],
     ),
 ]
-extensions = cythonize(extensions, compiler_directives={'embedsignature': True})
+extensions = cythonize(extensions, compiler_directives={"embedsignature": True})
 
 
 with open("README.md", "r") as fh:
