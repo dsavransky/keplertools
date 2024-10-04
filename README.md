@@ -26,4 +26,5 @@ https://keplertools.readthedocs.io/
 
 ## Acknowledgements
 
-Portions of this code are adapted from orvara (https://github.com/t-brandt/orvara).
+Portions of this code are adapted from orvara (https://github.com/t-brandt/orvara). orvara is distributed under a BSD 3-clause license and is Copyright (c) 2021, Timothy Brandt, Trent Dupuy, Yiting Li, G. Mirek Brandt, 
+Yunlin Zeng, Daniel Michalik, and Virginia Raposo-Pulido.
