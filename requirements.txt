@@ -1,4 +1,2 @@
 numpy
-coveralls
 cython
-hypothesis
