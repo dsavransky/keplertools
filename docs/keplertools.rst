@@ -28,6 +28,14 @@ keplertools.Cyeccanom module
    :undoc-members:
    :show-inheritance:
 
+keplertools.angutils module
+---------------------------
+
+.. automodule:: keplertools.angutils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 keplertools.fun module
 ----------------------
 
