@@ -1,6 +1,8 @@
 import numpy as np
 import numpy.typing as npt
 
+np.float_ = np.float64  # for numpy 2 compatibility
+
 
 def rotMat(axis: int, angle: float) -> npt.NDArray[np.float_]:
     """Returns the DCM ({}^B C^A) for a frame rotation of angle about
