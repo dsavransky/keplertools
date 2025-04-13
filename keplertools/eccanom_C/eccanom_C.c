@@ -185,7 +185,7 @@ void getbounds(double bounds[], double E_tab[], double e) {
   return;
 }
 
-inline double shortsin(double x) {
+double shortsin(double x) {
   // Taken from https://github.com/t-brandt/orvara
   double x2 = x * x;
   return x *
@@ -207,7 +207,7 @@ inline double shortsin(double x) {
  *
  *   Returns the initial estimate of the eccentric anomaly (rad).
  *=================================================================*/
-inline double Estart(double M, double e) {
+double Estart(double M, double e) {
 
   const double ome = 1. - e;
   const double sqrt_ome = sqrt(ome);
