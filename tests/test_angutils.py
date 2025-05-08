@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from keplertools.angutils import (
     calcDCM,
+    DCM2axang,
     rotMat,
     skew,
     colVec,
@@ -28,6 +29,34 @@ class TestAngUtils(unittest.TestCase):
             self.assertTrue(
                 np.max(np.abs(calcDCM(n, th).T - rotMat(j + 1, th))) < 1e-15
             )
+
+    def test_DCM_roundtrip(self):
+        """Test that DCM2axang and calcDCM are true inverses of one another"""
+
+        # generate random rotation axes and angles
+        N = int(1000)
+        ns = np.random.randn(3, N)
+        norms = np.sqrt(np.sum(ns**2, axis=0))
+        for j in range(3):
+            ns[j] = ns[j] / norms
+
+        ths = np.random.rand(N) * 2 * np.pi
+
+        # loop through and check round-trip calculation
+        tol = 1e-14
+        for j, (n, th) in enumerate(zip(ns.T, ths)):
+            DCM = calcDCM(n, th)
+            n1, th1 = DCM2axang(DCM)
+
+            # two pass conditions:
+            if th <= np.pi:
+                # expect everything to be the same
+                self.assertTrue(np.abs(th - th1) < tol)
+                self.assertTrue(np.all(np.abs(n - n1) < tol))
+            else:
+                # expect angle to be 2\pi - th and axis to be negative
+                self.assertTrue(np.abs(th - (2 * np.pi - th1)) < tol)
+                self.assertTrue(np.all(np.abs(n + n1) < tol))
 
     def test_skew(self):
         """Test skew-symmetric property for random inputs"""

@@ -54,6 +54,7 @@ Angle Methods
 * :py:meth:`~keplertools.angutils.rotMat` - Returns the direction cosine matrix (DCM) :math:`{}^B C^A` associated with rotating by a given angle about a one of the three axes of a reference frame
 * :py:meth:`~keplertools.angutils.skew` - Return the skew-symmetric matrix (cross product equivalent matrix) of a given vector 
 * :py:meth:`~keplertools.angutils.calcDCM` - Implements the Euler-Rodrigues equation to compute the DCM :math:`{}^A C^B` for a rotation of a given angle about any arbitrary axis. 
+* :py:meth:`~keplertools.angutils.DCM2axang` - Inverse computation of :py:meth:`~keplertools.angutils.calcDCM`.  
 * :py:meth:`~keplertools.angutils.calcang` - Compute the angle between two vectors when rotating (counter-clockwise) about a third vector. 
 * :py:meth:`~keplertools.angutils.projplane` - Project one or more vectors onto a plane orthogonal to another vector. 
 

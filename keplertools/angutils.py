@@ -113,6 +113,35 @@ def calcDCM(n: npt.ArrayLike, th: float) -> npt.NDArray[np.float_]:
     return DCM
 
 
+def DCM2axang(DCM):
+    r"""Given a direction cosine matrix :math:`{}^\mathcal{B}C^\mathcal{A}` compute
+    the axis and angle of the rotation.  Inverse of `calcDCM`.
+
+    Args:
+        DCM (numpy.ndarray):
+            3x3 Direction cosine matrix transforming vector components from frame A to
+            frame B
+
+    Returns:
+        tuple:
+            n (numpy.ndarray):
+                3x1 matrix representation of the unit vector of the axis of rotation
+            th (float):
+                Expression for the angle of rotation. Will always be between 0 and pi
+
+    """
+
+    costh = (DCM.trace() - 1) / 2
+    sinth = np.sqrt(1 - costh**2)
+    tmp = np.array(
+        [DCM[2, 1] - DCM[1, 2], DCM[0, 2] - DCM[2, 0], DCM[1, 0] - DCM[0, 1]]
+    )
+    n = tmp / 2 / sinth
+    th = np.arccos(costh)
+
+    return n, th
+
+
 def vnorm(v: npt.ArrayLike) -> npt.NDArray[np.float_]:
     """Return components of unit vector of input vector
 
