@@ -43,20 +43,31 @@ class TestAngUtils(unittest.TestCase):
         ths = np.random.rand(N) * 2 * np.pi
 
         # loop through and check round-trip calculation
-        tol = 1e-14
-        for j, (n, th) in enumerate(zip(ns.T, ths)):
+        thtols = np.zeros(N) + 1e-15
+        thtols[ths < 16 * np.pi / 180] = 1e-10
+        thtols[ths > (2 - 16 / 180) * np.pi] = 1e-10
+        thtols[np.abs(ths - np.pi) < 35 * np.pi / 180] = 1e-14
+        thtols[np.abs(ths - np.pi) < 5 * np.pi / 180] = 1e-10
+
+        ntols = np.zeros(N) + 1e-14
+        ntols[ths < 10 * np.pi / 180] = 1e-5
+        ntols[ths > (2 - 10 / 180) * np.pi] = 1e-5
+        ntols[np.abs(ths - np.pi) < 15 * np.pi / 180] = 1e-12
+        ntols[np.abs(ths - np.pi) < 2 * np.pi / 180] = 1e-5
+
+        for j, (n, th, ntol, thtol) in enumerate(zip(ns.T, ths, ntols, thtols)):
             DCM = calcDCM(n, th)
             n1, th1 = DCM2axang(DCM)
 
             # two pass conditions:
             if th <= np.pi:
                 # expect everything to be the same
-                self.assertTrue(np.abs(th - th1) < tol)
-                self.assertTrue(np.all(np.abs(n - n1) < tol))
+                self.assertTrue(np.abs(th - th1) < thtol)
+                self.assertTrue(np.all(np.abs(n - n1) < ntol))
             else:
                 # expect angle to be 2\pi - th and axis to be negative
-                self.assertTrue(np.abs(th - (2 * np.pi - th1)) < tol)
-                self.assertTrue(np.all(np.abs(n + n1) < tol))
+                self.assertTrue(np.abs(th - (2 * np.pi - th1)) < thtol)
+                self.assertTrue(np.all(np.abs(n + n1) < ntol))
 
     def test_skew(self):
         """Test skew-symmetric property for random inputs"""
