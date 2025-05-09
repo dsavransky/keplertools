@@ -13,7 +13,7 @@ Installation
 
 To install from PyPI: ::
 
-    pip install keplertools
+    pip install sympyhelpers
 
 
 To install from source, clone or download the code repository, and, in the top level directory run: ::
