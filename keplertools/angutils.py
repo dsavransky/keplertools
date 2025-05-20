@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from collections.abc import Iterable
 
 np.float_ = np.float64  # for numpy 2 compatibility
 
@@ -113,7 +114,7 @@ def calcDCM(n: npt.ArrayLike, th: float) -> npt.NDArray[np.float_]:
     return DCM
 
 
-def DCM2axang(DCM):
+def DCM2axang(DCM: npt.NDArray[np.float_]) -> tuple:
     r"""Given a direction cosine matrix :math:`{}^\mathcal{B}C^\mathcal{A}` compute
     the axis and angle of the rotation.  Inverse of `calcDCM`.
 
@@ -205,3 +206,133 @@ def projplane(v: npt.ArrayLike, nv: npt.ArrayLike) -> npt.NDArray[np.float_]:
     projv = v - np.vstack([np.dot(x, nv.flatten()) * nv for x in v.T]).T
 
     return projv
+
+
+def validateEulerAngSet(rotSet: Iterable[int]) -> int:
+    """Ensure that a rotation set is valid and return the number of unique elements
+
+    Args:
+        rotSet (Iterable):
+            3-element iterable defining order of rotations of a body Euler angle set.
+            For example, a Body-2 3-1-3 rotation would be [3,1,3] and a Body-3 3-2-1
+            rotation would be [3,2,1].
+
+
+    """
+    # ensure rotation set if valid
+    assert (
+        hasattr(rotSet, "__iter__") and len(rotSet) == 3
+    ), "rotSet must be an iterable of length 3."
+    assert (
+        len(set(rotSet) - set([1, 2, 3])) == 0
+    ), "Rotation set must contain only values 1, 2, 3."
+    assert np.all(
+        np.diff([1, 2, 1]) != 0
+    ), "Rotation set cannot contain two rotations about the same axis in a row."
+
+    # figure out whether this is a 2- or 3- rotation set
+    n = len(np.unique(rotSet))
+    assert n in [2, 3], "Rotation set must contain either 2 or 3 distinct elements."
+
+    return n
+
+
+def EulerAngSet2DCM(
+    rotSet: Iterable[int], angs: Iterable[float], body: bool = True,
+) -> npt.NDArray[np.float_]:
+    r"""Calculate the equivalent direction cosine matrix for an Euler Angle set
+
+
+    Args:
+        rotSet (Iterable):
+            3-element iterable defining order of rotations of a body Euler angle set.
+            For example, a Body-2 3-1-3 rotation would be [3,1,3] and a Body-3 3-2-1
+            rotation would be [3,2,1].
+        angs (Iterable):
+            3-elements iterable of symbols or expressions defining the angle of each
+            rotation.
+        body (bool):
+            True for body rotations, False for space rotations. Defaults to True.
+
+    Returns:
+        numpy.ndarray:
+            3x3 equivalent direction cosine matrix :math:`{}^\mathcal{B}C^\mathcal{A}`
+
+    """
+    _ = validateEulerAngSet(rotSet)
+
+    assert (
+        hasattr(angs, "__iter__") and len(angs) == 3
+    ), "v must be an iterable of length 3."
+
+    DCM = np.eye(3)
+    for rot, ang in zip(rotSet, angs):
+        if body:
+            DCM = np.matmul(rotMat(rot, ang), DCM)
+        else:
+            DCM = np.matmul(DCM, rotMat(rot, ang))
+
+    return DCM
+
+
+def DCM2EulerAngSet(DCM, rotSet, body=True):
+    """
+
+    Args:
+        DCM (sympy.matrices.dense.MutableDenseMatrix):
+            Direction Cosine Matrix
+        rotSet (iterable):
+            3-element iterable defining order of rotations of a body Euler angle set.
+            Indexing is 1-based, so valid rotation sets may only contains 1, 2, or 3.
+            A valid rotation set contains exactly 3 elements, at least 2 of which are
+            distinct, and with no rotations about the same axis repeated in a row.
+            [1, 2, 3] and [1, 3, 1] are valid, but [1, 1, 2] is not.
+        body (bool):
+            True for body rotations, False for space rotations. Defaults to True.
+
+    Returns:
+
+
+    """
+    # ensure rotation set if valid
+    n = validateEulerAngSet(rotSet)
+
+    # extract elements of the Euler angle set for easier use in indexing
+    i, j, k = np.asarray(rotSet) - 1
+
+    if n == 3:
+        # 3-axis rotation
+        # first apply the negatives
+        A = np.array([[1, 1, -1], [-1, 1, 1], [1, -1, 1]]) * DCM
+
+        # if this is a space rotation, transpose the matrix
+        if not body:
+            A = A.T
+
+        # extract the angles
+        sinth2 = A[k, i]  # sin(\theta_2)
+        costh2 = np.sqrt(A[i, i] ** 2 + A[j, i] ** 2)  # cos(\theta_2)
+        th2 = np.arctan2(sinth2, costh2)
+        th1 = np.arctan2(A[k, j] / costh2, A[k, k] / costh2)
+        th3 = np.arctan2(A[j, i] / costh2, A[i, i] / costh2)
+    else:
+        # 2-axis rotation
+        # first take care of the negative
+        A = DCM
+        negval = {1: (2, 1), 2: (0, 2), 3: (1, 0)}
+        A[negval[rotSet[1]]] *= -1
+
+        # if this is a space rotation, transpose the matrix
+        if not body:
+            A = A.T
+
+        # compute element missing from rotation set
+        p = 5 - (rotSet[0] + rotSet[1])
+
+        costh2 = A[i, i]  # cos(\theta_2)
+        sinth2 = np.sqrt(A[p, i] ** 2 + A[j, i] ** 2)  # sin(\theta_2)
+        th2 = np.arctan2(sinth2, costh2)
+        th1 = np.arctan2(A[i, j] / sinth2, A[i, p] / sinth2)
+        th3 = np.arctan2(A[j, i] / sinth2, A[p, i] / sinth2)
+
+    return [th1, th2, th3]
