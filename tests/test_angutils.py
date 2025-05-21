@@ -9,6 +9,8 @@ from keplertools.angutils import (
     vnorm,
     calcang,
     projplane,
+    EulerAng2DCM,
+    DCM2EulerAng,
 )
 
 
@@ -68,6 +70,41 @@ class TestAngUtils(unittest.TestCase):
                 # expect angle to be 2\pi - th and axis to be negative
                 self.assertTrue(np.abs(th - (2 * np.pi - th1)) < thtol)
                 self.assertTrue(np.all(np.abs(n + n1) < ntol))
+
+    def test_EulerAng_roundtrip(self):
+        """Test that EulerAng2DCM and DCM2EulerAng are true inverses of one another"""
+
+        # generate random rotation sets
+        N = int(1000)
+
+        # pick 1st and 3rd rots randomly and then ensure that second rotation is not
+        # redundant with either
+        rotSets = np.zeros((N, 3), dtype=int)
+        rotSets[:, 0] = np.random.choice([1, 2, 3], N)
+        rotSets[:, 2] = np.random.choice([1, 2, 3], N)
+        totset = set([1, 2, 3])
+        for j in range(N):
+            rotSets[j, 1] = np.random.choice(list(totset - set(rotSets[j, [0, 2]])), 1)[
+                0
+            ]
+
+        # generate random rotation angles
+        angSets = np.random.rand(N, 3) * 2 * np.pi - np.pi
+
+        # check the roundtrip
+        tol = 1e-15
+        for j, (rotSet, angs) in enumerate(zip(rotSets, angSets)):
+            # body:
+            DCM = EulerAng2DCM(rotSet, angs)
+            angsout = DCM2EulerAng(DCM, rotSet)
+            DCM2 = EulerAng2DCM(rotSet, angsout)
+            self.assertTrue(np.max(np.abs(DCM - DCM2)) < tol)
+
+            # space:
+            DCM = EulerAng2DCM(rotSet, angs, body=False)
+            angsout = DCM2EulerAng(DCM, rotSet, body=False)
+            DCM2 = EulerAng2DCM(rotSet, angsout, body=False)
+            self.assertTrue(np.max(np.abs(DCM - DCM2)) < tol)
 
     def test_skew(self):
         """Test skew-symmetric property for random inputs"""

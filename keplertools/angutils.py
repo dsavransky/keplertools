@@ -237,7 +237,7 @@ def validateEulerAngSet(rotSet: Iterable[int]) -> int:
     return n
 
 
-def EulerAngSet2DCM(
+def EulerAng2DCM(
     rotSet: Iterable[int], angs: Iterable[float], body: bool = True,
 ) -> npt.NDArray[np.float_]:
     r"""Calculate the equivalent direction cosine matrix for an Euler Angle set
@@ -275,7 +275,7 @@ def EulerAngSet2DCM(
     return DCM
 
 
-def DCM2EulerAngSet(DCM, rotSet, body=True):
+def DCM2EulerAng(DCM, rotSet, body=True):
     """
 
     Args:
@@ -318,7 +318,7 @@ def DCM2EulerAngSet(DCM, rotSet, body=True):
     else:
         # 2-axis rotation
         # first take care of the negative
-        A = DCM
+        A = DCM.copy()
         negval = {1: (2, 1), 2: (0, 2), 3: (1, 0)}
         A[negval[rotSet[1]]] *= -1
 
