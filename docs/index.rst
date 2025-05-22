@@ -5,7 +5,7 @@
 
 keplertools
 =======================================
-``keplertools`` provides a variety of methods for the propagation of two-body orbits as well as routines for operating on 3D Euclidean vectors and computing a variety of angles and projections.
+``keplertools`` provides a variety of methods for the propagation of two-body orbits.
 
 
 Installation
@@ -48,27 +48,6 @@ Radial Velocity Methods
 -------------------------
 * :py:meth:`~keplertools.fun.calc_RV_from_M` - Calculate the combined radial velocity of a system of n objects at m epochs given mean anomalies.
 * :py:meth:`~keplertools.fun.calc_RV_from_time` - Calculate the combined radial velocity of a system of n objects at m epochs given times.
-
-Angle Methods
-------------------
-* :py:meth:`~keplertools.angutils.rotMat` - Returns the direction cosine matrix (DCM) :math:`{}^B C^A` associated with rotating by a given angle about a one of the three axes of a reference frame
-* :py:meth:`~keplertools.angutils.skew` - Return the skew-symmetric matrix (cross product equivalent matrix) of a given vector 
-* :py:meth:`~keplertools.angutils.calcDCM` - Implements the Euler-Rodrigues equation to compute the DCM :math:`{}^A C^B` for a rotation of a given angle about any arbitrary axis. 
-* :py:meth:`~keplertools.angutils.DCM2axang` - Inverse computation of :py:meth:`~keplertools.angutils.calcDCM`.  
-* :py:meth:`~keplertools.angutils.calcang` - Compute the angle between two vectors when rotating (counter-clockwise) about a third vector. 
-* :py:meth:`~keplertools.angutils.projplane` - Project one or more vectors onto a plane orthogonal to another vector. 
-
-As we have two methods that are effective inverses of one another (:py:meth:`~keplertools.angutils.calcDCM` and :py:meth:`~keplertools.angutils.DCM2axang`), we can check the numerical errors associated with conversions between axis/angle and DCM representations of the same rotations.  
-
-|pic1|  |pic2|
-
-    .. |pic1| image:: DCM_roundtrip_theta_errs.png
-        :width: 49%
-
-    .. |pic2| image:: DCM_roundtrip_n_errs.png
-        :width: 49%
-
-These figures show the absolute error in angle (left) and maximum absolute error in axis component when converting from an initial axis/angle representation to a DCM and then inverting the process.  As expected, errors are functions of the angle, and peak around multiples of :math:`\pi`.
 
 .. toctree::
    :maxdepth: 4
