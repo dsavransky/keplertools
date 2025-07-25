@@ -190,11 +190,9 @@ def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
         E (float or ndarray):
             eccentric anomaly (rad)
         e (float or ndarray):
-            eccentricity (eccentricity may be a scalar if M is given as
-            an array, but otherwise must match the size of M.)
-
+            eccentricity
     Returns:
-        ndarray:
+        ~numpy.ndarray:
             true anomaly (rad)
 
     Notes:
@@ -218,6 +216,42 @@ def trueanom(E: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
     nu[nu < 0] += 2 * np.pi
 
     return nu  # type: ignore
+
+
+def true2eccanom(nu: npt.ArrayLike, e: npt.ArrayLike) -> npt.NDArray[np.float_]:
+    """Finds eccentric anomaly from true anomaly and eccentricity
+
+    Args:
+        nu (float or ndarray):
+            true anomaly (rad)
+        e (float or ndarray):
+            eccentricity
+
+    Returns:
+        ~numpy.ndarray:
+            true anomaly (rad)
+
+    Notes:
+        If either nu or e are scalar, and the other input is an array, the scalar
+        input will be expanded to the same size array as the other input.
+
+    """
+
+    nu = np.array(nu, ndmin=1).astype(float).flatten()
+    e = np.array(e, ndmin=1).astype(float).flatten()
+    if e.size != nu.size:
+        if e.size == 1:
+            e = np.array([e[0]] * len(nu))
+        if nu.size == 1:
+            nu = np.array([nu[0]] * len(e))
+
+    assert e.shape == nu.shape, "Incompatible inputs."
+    assert np.all((e >= 0) & (e < 1)), "e defined outside [0,1)"
+
+    E = 2.0 * np.arctan(np.sqrt((1.0 - e) / (1.0 + e)) * np.tan(nu / 2.0))
+    E[E < 0] += 2 * np.pi
+
+    return E  # type: ignore
 
 
 def vec2orbElem2(

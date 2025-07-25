@@ -3,6 +3,7 @@ from keplertools.fun import (
     eccanom,
     eccanom_orvara,
     trueanom,
+    true2eccanom,
     vec2orbElem,
     vec2orbElem2,
     calcAB,
@@ -30,7 +31,7 @@ class TestKeplerTools(unittest.TestCase):
         pass
 
     def test_eccanom_vecM_scalare(self):
-        """Test eccentric anomaly calculation for a scalar eccentricity value
+        r"""Test eccentric anomaly calculation for a scalar eccentricity value
 
         Use a normal distribution with sigma 2\pi to ensure that some M values are
         outside of (0,2\pi) range
@@ -47,10 +48,13 @@ class TestKeplerTools(unittest.TestCase):
 
         # Test eccanom_orvara against eccanom
         E_orvara, *_ = eccanom_orvara(M, e)
-        self.assertTrue(np.max(np.abs(E - E_orvara)) < 1e-9, f"max diff: {max(np.abs(E - E_orvara))}")
+        self.assertTrue(
+            np.max(np.abs(E - E_orvara)) < 1e-9,
+            f"max diff: {max(np.abs(E - E_orvara))}",
+        )
 
     def test_eccanom_vecM_scalare_noc(self):
-        """Test eccentric anomaly calc for a scalar eccentricity value (Python value)
+        r"""Test eccentric anomaly calc for a scalar eccentricity value (Python value)
 
         Use a normal distribution with sigma 2\pi to ensure that some M values are
         outside of (0,2\pi) range
@@ -66,7 +70,7 @@ class TestKeplerTools(unittest.TestCase):
         )
 
     def test_eccanom_vecM_vece(self):
-        """Test eccentric anomaly calculation for vector of eccentricities
+        r"""Test eccentric anomaly calculation for vector of eccentricities
 
         Use a normal distribution with sigma 2\pi to ensure that some M values are
         outside of (0,2\pi) range
@@ -83,10 +87,13 @@ class TestKeplerTools(unittest.TestCase):
 
         # Test eccanom_orvara against eccanom
         E_orvara, *_ = eccanom_orvara(M, e)
-        self.assertTrue(np.max(np.abs(E - E_orvara)) < 1e-8, f"max diff: {max(np.abs(E - E_orvara))}")
+        self.assertTrue(
+            np.max(np.abs(E - E_orvara)) < 1e-8,
+            f"max diff: {max(np.abs(E - E_orvara))}",
+        )
 
     def test_eccanom_vecM_vece_noc(self):
-        """Test eccentric anomaly calculation for vector of eccentricities (python ver)
+        r"""Test eccentric anomaly calculation for vector of eccentricities (python ver)
 
         Use a normal distribution with sigma 2\pi to ensure that some M values are
         outside of (0,2\pi) range
@@ -249,6 +256,17 @@ class TestKeplerTools(unittest.TestCase):
             < 1e-9
         )
 
+    def test_trueanom_roundtrip(self):
+        """Test True anomaly to Eccentric anomaly round trip"""
+
+        n = self.n
+        nu = np.random.rand(n) * 2 * np.pi
+        e = np.random.rand(n)
+        E = true2eccanom(nu, e)
+        nu2 = trueanom(E, e)
+
+        self.assertTrue(np.abs(nu - nu2).max() < 1e-9)
+
     def test_invkepler(self):
         """Test generalized kepler inverse function"""
 
@@ -398,5 +416,6 @@ class TestKeplerTools(unittest.TestCase):
             )
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
