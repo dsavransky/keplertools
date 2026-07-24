@@ -14,11 +14,11 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v6
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
       - name: Install dependencies
@@ -52,7 +52,7 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1.13.0
@@ -71,10 +71,10 @@ jobs:
         uses: docker/setup-qemu-action@v3
         with:
           platforms: all
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Display Python Version
         run: python -c "import sys; print(sys.version)"
       - name: Install dependencies
@@ -108,10 +108,10 @@ jobs:
           pattern: artifact-*
           merge-multiple: true
           path: dist
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
       - name: Install dependencies
